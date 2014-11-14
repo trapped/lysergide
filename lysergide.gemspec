@@ -9,5 +9,7 @@ Gem::Specification.new do |gem|
 
   gem.files     = %x{ git ls-files }.split("\n").select { |d| d =~ %r{^(LICENSE|README|bin/|lib/)} }
 
-  gem.add_dependency ['sinatra', 'erb', 'coffee']
+  gem.add_dependency 'sinatra'
+  gem.add_dependency 'coffee'
+  gem.add_dependency 'thin'
 end

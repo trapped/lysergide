@@ -1,8 +1,8 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gemspec
 
 gem 'sinatra'
-gem 'erb'
+gem 'thin'
 gem 'coffee'
 gem 'acid', :git => 'https://github.com/C453/acid.git'
