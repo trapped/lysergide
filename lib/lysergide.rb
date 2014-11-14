@@ -5,7 +5,8 @@ module Lysergide
 
 	def self.start(port)
 		require 'lysergide/application'
-		$lsd = Lysergide::Application.new
-		$lsd.start(port)
+		lsd = Lysergide::Application
+		lsd.set :port, port
+		lsd.run!
 	end
 end
