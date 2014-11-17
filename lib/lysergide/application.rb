@@ -1,11 +1,18 @@
 require 'sinatra/base'
-require 'erb'
+require 'sass'
+require 'haml'
 require 'coffee'
 
 class Lysergide::Application < Sinatra::Base
-	set :server, :thin
+	set :server, :webrick
+	set :views, settings.root + '/../../views'
 
-	get '/' do
-		erb :index
+	# Static images
+	get '/img/*' do |path|
+		if File.exists? settings.root + "/../../images/#{path}"
+			send_file settings.root + "/../../images/#{path}" 
+		else
+			status 404
+		end
 	end
 end
