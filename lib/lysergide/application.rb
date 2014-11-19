@@ -5,7 +5,7 @@ require 'coffee'
 
 class Lysergide::Application < Sinatra::Base
 	set :server, :webrick
-	set :views, settings.root + '/../../views'
-	set :public_folder, settings.root + '/../../static'
+	set :root, File.dirname(__FILE__) + '/../../'
+	set :public_folder, 'static'
 	enable :static
 end
