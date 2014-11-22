@@ -2,7 +2,8 @@ require 'sinatra/base'
 require 'lysergide/login'
 require 'lysergide/database'
 require 'haml'
-require 'dish/ext'
+
+include Lysergide::Database
 
 class Lysergide::Application < Sinatra::Base
 	set :server, :webrick
@@ -18,11 +19,8 @@ class Lysergide::Application < Sinatra::Base
 		haml :base
 	end
 
-	def user
-		Lysergide::Database.user(session[:user]).to_dish if session[:user]
-	end
-
 	get '/' do
+		user = User.find(session[:user]) || nil
 		if user
 			haml :dashboard, :locals => {
 				:title => 'Lysergide CI - Dashboard',
