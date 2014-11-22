@@ -23,6 +23,11 @@ class Lysergide::Login < Sinatra::Base
 		end
 	end
 
+	get '/logout' do
+		session[:user] = nil if session[:user]
+		redirect '/'
+	end
+
 	post '/login' do
 		if !session[:user]
 			user = User.find_by_email params[:email]

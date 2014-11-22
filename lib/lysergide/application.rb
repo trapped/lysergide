@@ -16,11 +16,10 @@ class Lysergide::Application < Sinatra::Base
 	use Lysergide::Login
 
 	get '/' do
-		user = User.find(session[:user]) || nil
-		if user
+		if session[:user]
 			haml :dashboard, layout: :base, :locals => {
 				:title => 'Lysergide CI - Dashboard',
-				:user => user
+				:user => User.find(session[:user])
 			}
 		else
 			redirect '/login'
