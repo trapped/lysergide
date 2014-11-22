@@ -3,6 +3,8 @@ require 'lysergide/database'
 require 'haml'
 require 'colorize'
 
+include Lysergide::Database
+
 class Lysergide::Login < Sinatra::Base
 	set :root, File.dirname(__FILE__) + '/../../'
 	set :public_folder, settings.root + '/static'
@@ -15,17 +17,19 @@ class Lysergide::Login < Sinatra::Base
 			redirect '/'
 		else
 			haml :login, :layout => :base, :locals => {
-				:title => 'Lysergide CI - Login'
+				title: 'Lysergide CI - Login',
+				error: params[:err] ? 'Wrong email/password combination.' : nil
 			}
 		end
 	end
 
 	post '/login' do
 		if !session[:user]
-			user = Lysergide::Database.login(params[:email], params[:password])
-			puts __FILE__ + user.inspect.to_s.red
-			if user
-				session[:user] = user
+			user = User.find_by_email params[:email]
+			if user && user.password == params[:password]
+				session[:user] = user.id
+			else
+				redirect '/login?err=1'
 			end
 		end
 		redirect '/'
