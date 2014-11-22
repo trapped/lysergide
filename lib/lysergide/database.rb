@@ -1,57 +1,84 @@
 require 'sqlite3'
+require 'timeout'
+require 'colorize'
 
 module Lysergide
 	module Database
 		# Get a Database object
 		def self.open(&block)
-			conn = SQLite3::Database.new 'lysergide.db' do |db|
-				# Allow accessing row data by column name instead of index
-				db.results_as_hash = true
-			end
+			conn = SQLite3::Database.new 'lysergide.db'
+			# Allow accessing row data by column name instead of index
+			conn.results_as_hash = true
 			if block
-				block.call conn
-				conn.close
+				begin
+					block.call(conn)
+				ensure
+					conn.close
+				end
 			else
 				return conn
 			end
 		end
 
+		def self.destroy()
+			begin
+				if !File.exists? 'lysergide.db'
+					raise 'No database to wipe.'
+				end
+				print 'Do you really want to completely wipe the database? (10 seconds before timeout) [y/N] '
+				Timeout.timeout(10) {
+					answer = STDIN.gets.chomp
+					if answer.length > 0 && answer[0].upcase == 'Y'
+						File.delete 'lysergide.db'
+					end
+					puts "\nDatabase wiped. You can initialize a new one with 'lsd populate user email password'"
+					return 0
+				}
+			rescue => e
+				puts "Database wipe aborted: '#{e.message.to_s.red}'"
+			end
+			return 1
+		end
+
 		# Populate the database with initial/default data (admin account, etc.)
-		def self.populate()
+		def self.populate(name, email, password)
 			self.open do |db|
 				# Create users table
 				db.execute %{
 					CREATE TABLE users (
-						name		text	unique,
-						email		text	unique,
-						password	text,
+						id			integer	primary key	autoincrement,
+						name		text	unique	not null,
+						email		text	unique	not null,
+						password	text			not null,
 						repos		text,
 						builds		text
-					);
+					)
 				}
 				# Add admin user
-				self.add_user('admin', 'admin@example.com')
+				self.add_user(name || 'admin', email || 'admin@example.com', password || 'admin')
 
 				# Create repos table
 				db.execute %{
 					CREATE TABLE repos (
-						name		text,
-						import_path	text	unique,
-						owner		integer,
+						id			integer	primary key	autoincrement,
+						name		text			not null,
+						import_path	text	unique	not null,
+						owner		integer			not null,
 						builds		text
-					);
+					)
 				}
 
 				# Create builds table
 				db.execute %{
 					CREATE TABLE builds (
-						repo		integer,
-						number		integer,
-						status		text,
+						id			integer	primary key	autoincrement,
+						repo		integer			not null,
+						number		integer			not null,
+						status		text			not null,
 						duration	integer,
-						ref			text,
+						ref			text			not null,
 						log			text
-					);
+					)
 				}
 			end
 		end
@@ -63,21 +90,9 @@ module Lysergide
 					INSERT INTO users
 						(name, email, password)
 					VALUES
-						(?, ?, ?);
+						(?, ?, ?)
 				}, [name, email, password]
 				return db.last_insert_row_id
-			end
-		end
-
-		# Get the corresponding id from a username
-		def self.user_id(name)
-			self.open do |db|
-				db.execute %{
-					SELECT rowid FROM users
-					WHERE name = '?';
-				}, [name] do |row|
-					return row['rowid']
-				end
 			end
 		end
 
@@ -89,12 +104,12 @@ module Lysergide
 					INSERT INTO repos
 						(name, import_path, owner)
 					VALUES
-						(?, ?, ?);
-				}, [name || import_path.split('/').last.delete '.git', # If no name was supplied, use the repo filename
+						(?, ?, ?)
+				}, [name || import_path.split('/').last.delete('.git'), # If no name was supplied, use the repo filename
 					import_path,
 					owner_id] # If the function was called using the owner id, use it, otherwise convert
 				repo_id = db.last_insert_row_id
-				db.execute %{
+				db.execute_batch %{
 					UPDATE users SET
 						repos = repos ||
 							CASE repos NOT LIKE '' THEN
@@ -108,5 +123,53 @@ module Lysergide
 				return repo_id
 			end
 		end
+
+		# If an email and password match an account, get its id
+		def self.login(email, password)
+			self.open do |db|
+				row = db.get_first_row %{
+					SELECT id FROM users
+					WHERE email = ? AND password = ?
+				}, [email, password]
+				return row['id'] if row
+			end
+		end
+
+		# Get a user row
+		def self.user(id)
+			self.open do |db|
+				row = db.get_first_row %{
+					SELECT name, email, repos, builds FROM users
+					WHERE id = ?
+				}, [id]
+				return {
+					:name => row['name'],
+					:email => row['email'],
+					:repos => row['repos'],
+					:builds => row['builds']
+				} if row
+			end
+		end
+
+		# Get the row id of something (user, repo, build) by name
+		def self.id_of(name, type=:user)
+			self.open do |db|
+				row = db.get_first_row %{
+					SELECT id FROM ?
+					WHERE name = ?
+				}, [{case type
+					when :user 'users'
+					when :repo 'repos'
+					when :build 'builds'
+					else
+						raise "unknown type #{type}"
+					end
+					}, name]
+				return row['id'] if row
+			end
+		end
+
+		# Get the name of something (user, repo)
+		def self.name_of()
 	end
 end

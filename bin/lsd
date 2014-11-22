@@ -7,5 +7,30 @@ $:.unshift File.expand_path('../../lib', Pathname.new(__FILE__).realpath)
 
 require 'lysergide'
 
-# Start Lysergide
-Lysergide::start(ARGV.length > 0? ARGV[0] : 3000)
+puts
+
+if ARGV.length > 0
+	case ARGV[0]
+	when 'start'
+		if ARGV.length > 1
+			Lysergide.start(ARGV[1])
+		else
+			Lysergide.start(3000)
+		end
+	when 'populate'
+		require 'lysergide/database'
+		begin
+			Lysergide::Database.populate(ARGV[1] || nil, ARGV[2] || nil, ARGV[3] || nil)
+			puts "Populated database; default user: '#{ARGV[1] || 'admin'}', '#{ARGV[2] || 'admin@example.com'}', '#{ARGV[3] || 'admin'}'"
+			exit 0
+		rescue
+			puts 'Couldn\'t populate the database; perhaps it already contains data you might want to wipe with \'lsd destroy\''
+			exit 1
+		end
+	when 'destroy'
+		require 'lysergide/database'
+		exit Lysergide::Database.destroy
+	end
+else
+	Lysergide.start 3000
+end
