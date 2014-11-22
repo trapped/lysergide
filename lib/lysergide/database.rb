@@ -3,7 +3,11 @@ require 'active_record'
 module Lysergide
 	module Database
 		# Connect to the database
-		ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: 'lysergide.db'
+		ActiveRecord::Base.establish_connection ({
+			adapter: 'sqlite3',
+			database: 'lysergide.db',
+			pool: 16
+		})
 
 		# Define the database schema
 		ActiveRecord::Schema.define do
@@ -25,7 +29,8 @@ module Lysergide
 
 			unless ActiveRecord::Base.connection.tables.include? 'builds'
 				create_table :builds do |table|
-					table.column :repo,			:integer
+					table.column :repo_id,		:integer
+					table.column :user_id,		:integer
 					table.column :number,		:integer
 					table.column :status,		:text
 					table.column :duration,		:integer
@@ -37,6 +42,7 @@ module Lysergide
 
 		class User < ActiveRecord::Base
 			has_many :repos
+			has_many :builds
 		end
 
 		class Repo < ActiveRecord::Base
