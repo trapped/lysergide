@@ -16,7 +16,7 @@ class Lysergide::Login < Sinatra::Base
 		if session[:user]
 			redirect '/'
 		else
-			haml :login, :layout => :base, :locals => {
+			haml :login, layout: :base, :locals => {
 				title: 'Lysergide CI - Login',
 				error: params[:err] ? 'Wrong email/password combination.' : nil
 			}

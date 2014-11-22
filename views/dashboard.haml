@@ -173,7 +173,7 @@
             %ul.nav.nav-second-level
               - user.repos.each do |repo|
                 %li
-                  %a{:href => "/repo/" + repo}= repo
+                  %a{:href => "/repo/" + repo.name}= repo.name
   #page-wrapper
     .row
       .col-lg-12

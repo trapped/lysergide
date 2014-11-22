@@ -15,14 +15,10 @@ class Lysergide::Application < Sinatra::Base
 
 	use Lysergide::Login
 
-	template :layout do
-		haml :base
-	end
-
 	get '/' do
 		user = User.find(session[:user]) || nil
 		if user
-			haml :dashboard, :locals => {
+			haml :dashboard, layout: :base, :locals => {
 				:title => 'Lysergide CI - Dashboard',
 				:user => user
 			}

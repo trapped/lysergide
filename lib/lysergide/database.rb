@@ -19,7 +19,7 @@ module Lysergide
 				create_table :repos do |table|
 					table.column :name,			:string
 					table.column :import_path,	:string
-					table.column :owner,		:integer
+					table.column :user_id,		:integer
 				end
 			end
 
@@ -40,7 +40,7 @@ module Lysergide
 		end
 
 		class Repo < ActiveRecord::Base
-			belongs_to :owner
+			belongs_to :user
 			has_many :builds
 		end
 
