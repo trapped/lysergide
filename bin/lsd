@@ -6,6 +6,7 @@ require 'pathname'
 $:.unshift File.expand_path('../../lib', Pathname.new(__FILE__).realpath)
 
 require 'lysergide'
+require 'colorize'
 
 puts
 
@@ -20,7 +21,11 @@ if ARGV.length > 0
 	when 'populate'
 		require 'lysergide/database'
 		begin
-			Lysergide::Database.populate(ARGV[1] || nil, ARGV[2] || nil, ARGV[3] || nil)
+			Lysergide::Database::User.create(
+				name: ARGV[1] || 'admin',
+				email: ARGV[2] || 'admin@example.com',
+				password: ARGV[3] || 'admin'
+			)
 			puts "Populated database; default user: '#{ARGV[1] || 'admin'}', '#{ARGV[2] || 'admin@example.com'}', '#{ARGV[3] || 'admin'}'"
 			exit 0
 		rescue
@@ -28,8 +33,24 @@ if ARGV.length > 0
 			exit 1
 		end
 	when 'destroy'
-		require 'lysergide/database'
-		exit Lysergide::Database.destroy
+		begin
+			if !File.exists? 'lysergide.db'
+				puts 'No database to wipe.'
+				exit 1
+			end
+			print 'Do you really want to completely wipe the database? (10 seconds before timeout) [y/N] '
+			Timeout.timeout(10) {
+				answer = STDIN.gets.chomp
+				if answer.length > 0 && answer[0].upcase == 'Y'
+					File.delete 'lysergide.db'
+				end
+				puts "\nDatabase wiped. You can initialize a new one with 'lsd populate user email password'"
+				return 0
+			}
+		rescue => e
+			puts "Database wipe aborted: '#{e.message.to_s.red}'"
+		end
+		return 1
 	end
 else
 	Lysergide.start 3000
