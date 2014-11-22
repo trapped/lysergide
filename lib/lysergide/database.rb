@@ -3,7 +3,7 @@ require 'active_record'
 module Lysergide
 	module Database
 		# Connect to the database
-		ActiveRecord::Base.establish_connection {adapter: 'sqlite3', database: 'lysergide.db'}
+		ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: 'lysergide.db'
 
 		# Define the database schema
 		ActiveRecord::Schema.define do

@@ -7,6 +7,7 @@ $:.unshift File.expand_path('../../lib', Pathname.new(__FILE__).realpath)
 
 require 'lysergide'
 require 'colorize'
+require 'timeout'
 
 puts
 
@@ -45,12 +46,12 @@ if ARGV.length > 0
 					File.delete 'lysergide.db'
 				end
 				puts "\nDatabase wiped. You can initialize a new one with 'lsd populate user email password'"
-				return 0
+				exit 0
 			}
 		rescue => e
-			puts "Database wipe aborted: '#{e.message.to_s.red}'"
+			puts "\nDatabase wipe aborted: '#{e.message.to_s.red}'"
 		end
-		return 1
+		exit 1
 	end
 else
 	Lysergide.start 3000
