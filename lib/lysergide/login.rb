@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require 'lysergide/database'
 require 'haml'
-require 'colorize'
 
 include Lysergide::Database
 
@@ -10,7 +9,7 @@ class Lysergide::Login < Sinatra::Base
 	set :public_folder, settings.root + '/static'
 	set :views, settings.root + '/views'
 	enable :static
-	use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => 'lysergide'
+	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
 
 	get '/login' do
 		if session[:user]
@@ -23,11 +22,6 @@ class Lysergide::Login < Sinatra::Base
 		end
 	end
 
-	get '/logout' do
-		session[:user] = nil if session[:user]
-		redirect '/'
-	end
-
 	post '/login' do
 		if !session[:user]
 			user = User.find_by_email params[:email]
@@ -37,6 +31,11 @@ class Lysergide::Login < Sinatra::Base
 				redirect '/login?err=1'
 			end
 		end
+		redirect '/'
+	end
+
+	get '/logout' do
+		session[:user] = nil if session[:user]
 		redirect '/'
 	end
 end

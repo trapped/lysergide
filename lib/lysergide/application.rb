@@ -18,13 +18,13 @@ class Lysergide::Application < Sinatra::Base
 	get '/' do
 		if session[:user]
 			haml :dashboard, layout: :base, :locals => {
-				:title => 'Lysergide CI - Dashboard',
-				:user => User.find(session[:user])
+				title: 'Lysergide CI - Dashboard',
+				user: User.find(session[:user])
 			}
 		else
 			redirect '/login'
 			haml :welcome, :locals => {
-				:title => 'Lysergide CI - Powered by Acid'
+				title: 'Lysergide CI - Powered by Acid'
 			}
 		end
 	end
