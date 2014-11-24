@@ -1,62 +1,27 @@
-#wrapper
-  %nav.navbar.navbar-default.navbar-static-top{:role => "navigation", :style => "margin-bottom: 0"}
-    .navbar-header
-      %button.navbar-toggle{"data-target" => ".navbar-collapse", "data-toggle" => "collapse", :type => "button"}
-        %span.sr-only Toggle navigation
-        %span.icon-bar
-        %span.icon-bar
-        %span.icon-bar
-      %a.navbar-brand{:href => "/"} Lysergide
-    %ul.nav.navbar-top-links.navbar-right
-      %li.dropdown
-        %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
-          %i.fa.fa-user.fa-fw
-          %i.fa.fa-caret-down
-        %ul.dropdown-menu.dropdown-user
-          %li
-            %a{:href => "/settings"}
-              %i.fa.fa-gear.fa-fw
-              Settings
-          %li.divider
-          %li
-            %a{:href => "/logout"}
-              %i.fa.fa-sign-out.fa-fw
-              Logout
-    .navbar-default.sidebar{:role => "navigation"}
-      .sidebar-nav.navbar-collapse
-        %ul#side-menu.nav
-          %li
-            %a.active
-              %i.fa.fa-book.fa-fw
-              = "Repositories (#{user.repos.length})"
-            %ul.nav.nav-second-level
-              - user.repos.each do |repo|
-                %li
-                  %a{:href => "/repo/" + repo.name}= repo.name
-  #page-wrapper
-    .row
-      .col-lg-12
-        %h1.page-header= "#{user.name}#{if user.name.end_with? 's' then '' else '\'s' end} dashboard"
-    .panel.panel-default
-      .panel-heading
-        %i.fa.fa-gear.fa-fw
-        Builds
-      .panel-body
-        - if user.builds.length > 0
-          .list-group
-            - user.builds.each do |build|
-              %a.list-group-item{:href => "/repo/#{build.repo}/build/#{build.number}"}
-                - case build.status
-                - when 'failed'
-                  %i.fa.fa-warning.fa-fw
-                - when 'succeeded'
-                  %i.fa.fa-check.fa-fw
-                - when 'in progress'
-                  %i.fa.fa-gear.fa-fw
-                Build
-                %b= build.number
-                = build.status
-                %span.pull-right.text-muted.small
-                  %em 6 days ago
-        - else
-          There are no builds to show here.
+#page-wrapper
+  .row
+    .col-lg-12
+      %h1.page-header= "#{user.name}#{if user.name.end_with? 's' then '' else '\'s' end} dashboard"
+  .panel.panel-default
+    .panel-heading
+      %i.fa.fa-gear.fa-fw
+      Builds
+    .panel-body
+      - if user.builds.length > 0
+        .list-group
+          - user.builds.each do |build|
+            %a.list-group-item{:href => "/repo/#{build.repo}/build/#{build.number}"}
+              - case build.status
+              - when 'failed'
+                %i.fa.fa-warning.fa-fw
+              - when 'succeeded'
+                %i.fa.fa-check.fa-fw
+              - when 'in progress'
+                %i.fa.fa-gear.fa-fw
+              Build
+              %b= build.number
+              = build.status
+              %span.pull-right.text-muted.small
+                %em 6 days ago
+      - else
+        There are no builds to show here.

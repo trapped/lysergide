@@ -14,7 +14,45 @@
     %link{:href => "css/plugins/morris.css", :rel => "stylesheet"}
     %link{:href => "css/font-awesome.min.css", :rel => "stylesheet"}
   %body
-    =yield
+    #wrapper
+      %nav.navbar.navbar-default.navbar-static-top{:role => "navigation", :style => "margin-bottom: 0"}
+        .navbar-header
+          %button.navbar-toggle{"data-target" => ".navbar-collapse", "data-toggle" => "collapse", :type => "button"}
+            %span.sr-only Toggle navigation
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+          %a.navbar-brand{:href => "/"}
+            %span.fa.fa-tint.fa-fw
+            %span Lysergide
+        - if defined? user
+          %ul.nav.navbar-top-links.navbar-right
+            %li.dropdown
+              %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+                %i.fa.fa-user.fa-fw
+                %i.fa.fa-caret-down
+              %ul.dropdown-menu.dropdown-user
+                %li
+                  %a{:href => "/settings"}
+                    %i.fa.fa-gear.fa-fw
+                    Settings
+                %li.divider
+                %li
+                  %a{:href => "/logout"}
+                    %i.fa.fa-sign-out.fa-fw
+                    Logout
+          .navbar-default.sidebar{:role => "navigation"}
+            .sidebar-nav.navbar-collapse
+              %ul#side-menu.nav
+                %li
+                  %a.active
+                    %i.fa.fa-book.fa-fw
+                    = "Repositories (#{user.repos.length})"
+                  %ul.nav.nav-second-level
+                    - user.repos.each do |repo|
+                      %li
+                        %a{:href => "/repo/" + repo.name}= repo.name
+      =yield
     %script{:src => "js/jquery.js"}
     %script{:src => "js/bootstrap.min.js"}
     %script{:src => "js/plugins/metisMenu/metisMenu.min.js"}
