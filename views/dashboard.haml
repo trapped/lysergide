@@ -2,6 +2,10 @@
   .col-lg-12
     %h1.page-header= "#{user.name}#{if user.name.end_with? 's' then '' else '\'s' end} dashboard"
 .row
+  .col-md-4
+    .form-group
+      %a.btn.btn-lg.btn-success.btn-block{href: '/add/repo'} Add a repo
+.row-fluid
   .panel.panel-default
     .panel-heading
       %i.fa.fa-gear.fa-fw

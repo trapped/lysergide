@@ -52,8 +52,12 @@
                     - user.repos.each do |repo|
                       %li
                         %a{:href => "/repo/" + repo.name}= repo.name
-      #page-wrapper
-        =yield
+      - if !defined? user
+        #page-wrapper{style: 'margin-left: 0px !important'}
+          =yield
+      - else
+        #page-wrapper
+          =yield
     %script{:src => "/js/jquery.js"}
     %script{:src => "/js/bootstrap.min.js"}
     %script{:src => "/js/plugins/metisMenu/metisMenu.min.js"}

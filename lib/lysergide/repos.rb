@@ -30,8 +30,10 @@ class Lysergide::Repos < Sinatra::Base
 				user_id: session[:user])\
 			then
 				status 200
+				redirect '/'
 			else
 				status 500
+				redirect '/add/repo?err=1'
 			end
 		else
 			redirect '/login'

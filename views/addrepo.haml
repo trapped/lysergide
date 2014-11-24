@@ -1,20 +1,19 @@
-.container-fluid
+.row
+  .col-lg-12
+    %h1.page-header Add a repository
   .row
-    .col-lg-12
-      %h1.page-header Add a repository
-    .row
-      .col-md-12
-        .row-fluid
-          .col-md-12
-            The repository will be periodically cloned and the
-            %code acid.yml
-            file will be used to determine what to do with it.
-        .row
-          .col-md-4
-            .panel-body
-              %form#addrepo{role: 'form'}
-                .form-group
-                  %input.form-control{autofocus: '', name: 'name', placeholder: 'Name'}
-                .form-group
-                  %input.form-control{name: 'import_path', placeholder: 'Clone path'}
-                %button.btn.btn-lg.btn-success.btn-block{type: 'submit', form: 'addrepo', formmethod: 'post', formaction: '/add/repo'} Add repo
+    .col-md-12
+      .row-fluid
+        .col-md-12
+          The repository will be periodically cloned and the
+          %code acid.yml
+          file will be used to determine what to do with it.
+      .row
+        .col-md-4
+          .panel-body
+            %form#addrepo{role: 'form'}
+              .form-group
+                %input.form-control{autofocus: '', name: 'name', placeholder: 'Name'}
+              .form-group
+                %input.form-control{name: 'import_path', placeholder: 'Clone path'}
+              %button.btn.btn-lg.btn-success.btn-block{type: 'submit', form: 'addrepo', formmethod: 'post', formaction: '/add/repo'} Add repo
