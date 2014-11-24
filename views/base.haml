@@ -7,12 +7,12 @@
     %meta{:content => "", :name => "description"}
     %meta{:content => "", :name => "author"}
     %title= title
-    %link{:href => "css/bootstrap.min.css", :rel => "stylesheet"}
-    %link{:href => "css/plugins/metisMenu/metisMenu.min.css", :rel => "stylesheet"}
-    %link{:href => "css/plugins/timeline.css", :rel => "stylesheet"}
-    %link{:href => "css/lysergide.css", :rel => "stylesheet"}
-    %link{:href => "css/plugins/morris.css", :rel => "stylesheet"}
-    %link{:href => "css/font-awesome.min.css", :rel => "stylesheet"}
+    %link{:href => "/css/bootstrap.min.css", :rel => "stylesheet"}
+    %link{:href => "/css/plugins/metisMenu/metisMenu.min.css", :rel => "stylesheet"}
+    %link{:href => "/css/plugins/timeline.css", :rel => "stylesheet"}
+    %link{:href => "/css/lysergide.css", :rel => "stylesheet"}
+    %link{:href => "/css/plugins/morris.css", :rel => "stylesheet"}
+    %link{:href => "/css/font-awesome.min.css", :rel => "stylesheet"}
   %body
     #wrapper
       %nav.navbar.navbar-default.navbar-static-top{:role => "navigation", :style => "margin-bottom: 0"}
@@ -52,11 +52,12 @@
                     - user.repos.each do |repo|
                       %li
                         %a{:href => "/repo/" + repo.name}= repo.name
-      =yield
-    %script{:src => "js/jquery.js"}
-    %script{:src => "js/bootstrap.min.js"}
-    %script{:src => "js/plugins/metisMenu/metisMenu.min.js"}
-    %script{:src => "js/plugins/morris/raphael.min.js"}
-    %script{:src => "js/plugins/morris/morris.min.js"}
-    %script{:src => "js/plugins/morris/morris-data.js"}
-    %script{:src => "js/lysergide.js"}
+      #page-wrapper
+        =yield
+    %script{:src => "/js/jquery.js"}
+    %script{:src => "/js/bootstrap.min.js"}
+    %script{:src => "/js/plugins/metisMenu/metisMenu.min.js"}
+    %script{:src => "/js/plugins/morris/raphael.min.js"}
+    %script{:src => "/js/plugins/morris/morris.min.js"}
+    %script{:src => "/js/plugins/morris/morris-data.js"}
+    %script{:src => "/js/lysergide.js"}

@@ -1,6 +1,7 @@
 require 'sinatra/base'
-require 'lysergide/login'
 require 'lysergide/database'
+require 'lysergide/login'
+require 'lysergide/repos'
 require 'haml'
 
 include Lysergide::Database
@@ -14,6 +15,7 @@ class Lysergide::Application < Sinatra::Base
 	use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => 'lysergide'
 
 	use Lysergide::Login
+	use Lysergide::Repos
 
 	get '/' do
 		if session[:user]
