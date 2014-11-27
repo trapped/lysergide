@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'lysergide/database'
+require 'lysergide/errors'
 require 'lysergide/login'
 require 'lysergide/repos'
 require 'haml'
@@ -14,6 +15,7 @@ class Lysergide::Application < Sinatra::Base
 	enable :static
 	use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => 'lysergide'
 
+	use Lysergide::Errors
 	use Lysergide::Login
 	use Lysergide::Repos
 
@@ -29,11 +31,5 @@ class Lysergide::Application < Sinatra::Base
 				title: 'Lysergide CI - Powered by Acid'
 			}
 		end
-	end
-
-	not_found do
-		haml :notfound, layout: :base, :locals => {
-			title: 'Lysergide CI - Not found'
-		}
 	end
 end

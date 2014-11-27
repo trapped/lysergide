@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'lysergide/database'
+require 'lysergide/errors'
 require 'haml'
 require 'uri'
 
@@ -11,6 +12,8 @@ class Lysergide::Repos < Sinatra::Base
 	set :views, settings.root + '/views'
 	enable :static
 	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
+
+	use Lysergide::Errors
 
 	def is_valid_name?(name)
 		(name =~ /\A\p{Alnum}+\z/) != nil
@@ -48,41 +51,52 @@ class Lysergide::Repos < Sinatra::Base
 		return obj
 	end
 
-	get '/add/repo' do
-		if session[:user]
-			haml :addrepo, layout: :base, :locals => {
-				title: 'Lysergide CI - Add repo',
-				user: User.find(session[:user]),
-				alert: alert_obj(params[:err])
-			}
-		else
+	before do
+		unless session[:user]
 			redirect '/login'
 		end
 	end
 
-	post '/add/repo' do
-		if session[:user]
-			case
-			when !is_valid_name?(params[:name])
-				status 500
-				redirect '/add/repo?err=name'
-			when !is_valid_path?(params[:import_path])
-				status 500
-				redirect '/add/repo?err=path'
-			end
-			if Repo.create(
-				name: params[:name],
-				import_path: params[:import_path],
-				user_id: session[:user])
-			then
-				status 200
-				redirect '/'
-			else
-				status 500
-				redirect '/add/repo?err=unknown'
-			end
+	get '/repo/:name' do |name|
+		repo = User.find(session[:user]).repos.find_by_name(name)
+		if repo
+			haml :repo, layout: :base, :locals => {
+				title: "Lysergide CI - #{name}",
+				user: User.find(session[:user]),
+				alert: alert_obj(params[:err])
+			}
 		else
-			redirect '/login'
+			not_found
+		end
+	end
+
+	get '/add/repo' do
+		haml :addrepo, layout: :base, :locals => {
+			title: 'Lysergide CI - Add repo',
+			user: User.find(session[:user]),
+			alert: alert_obj(params[:err])
+		}
+	end
+
+	post '/add/repo' do
+		case
+		when !is_valid_name?(params[:name])
+			status 500
+			redirect '/add/repo?err=name'
+		when !is_valid_path?(params[:import_path])
+			status 500
+			redirect '/add/repo?err=path'
+		end
+		if Repo.create(
+			name: params[:name],
+			import_path: params[:import_path],
+			user_id: session[:user])
+		then
+			status 200
+			redirect '/'
+		else
+			status 500
+			redirect '/add/repo?err=unknown'
 		end
 	end
 end
