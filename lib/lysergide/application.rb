@@ -30,4 +30,10 @@ class Lysergide::Application < Sinatra::Base
 			}
 		end
 	end
+
+	not_found do
+		haml :notfound, layout: :base, :locals => {
+			title: 'Lysergide CI - Not found'
+		}
+	end
 end
