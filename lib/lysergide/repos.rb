@@ -14,6 +14,7 @@ class Lysergide::Repos < Sinatra::Base
 	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
 
 	use Lysergide::Errors
+	helpers Lysergide::ErrorHelpers
 
 	def is_valid_name?(name)
 		(name =~ /\A\p{Alnum}+\z/) != nil

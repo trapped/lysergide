@@ -16,6 +16,7 @@ class Lysergide::Application < Sinatra::Base
 	use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => 'lysergide'
 
 	use Lysergide::Errors
+	helpers Lysergide::ErrorHelpers
 	use Lysergide::Login
 	use Lysergide::Repos
 
