@@ -59,11 +59,13 @@ class Lysergide::Repos < Sinatra::Base
 	end
 
 	get '/repo/:name' do |name|
-		repo = User.find(session[:user]).repos.find_by_name(name)
+		user = User.find(session[:user])
+		repo = user.repos.find_by_name(name)
 		if repo
 			haml :repo, layout: :base, :locals => {
 				title: "Lysergide CI - #{name}",
-				user: User.find(session[:user]),
+				user: user,
+				repo: repo,
 				alert: alert_obj(params[:err])
 			}
 		else

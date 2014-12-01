@@ -1,19 +1,12 @@
 .row
-	.col-lg-12
-		%h1.page-header= "#{user.name}#{if user.name.end_with? 's' then '' else '\'s' end} dashboard"
-.row
-	.col-md-4
-		.form-group
-			%a.btn.btn-lg.btn-success.btn-block{href: '/add/repo'} Add a repo
+	.col-md-12
+		%h1.page-header= "#{user.name}/#{repo.name} - Builds"
 .row-fluid
 	.panel.panel-default
-		.panel-heading
-			%i.fa.fa-gear.fa-fw
-			Builds
 		.panel-body
-			- if user.builds.length > 0
+			- if repo.builds.length > 0
 				.list-group
-					- user.builds.each do |build|
+					- repo.builds.each do |build|
 						%a.list-group-item{:href => "/repo/#{build.repo}/builds/#{build.number}"}
 							- case build.status
 							- when :fail
@@ -27,6 +20,10 @@
 							Build
 							%b= build.number
 							%span= build.status
+							%span.pull-right.text-muted.small
+								%em= build.ref
+							%span.pull-right.text-muted.small
+								%em= build.duration
 							%span.pull-right.text-muted.small
 								%em= build.date
 			- else

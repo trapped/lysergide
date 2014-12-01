@@ -1,0 +1,51 @@
+.row
+	.col-md-12
+		%h1.page-header= "#{user.name}/#{repo.name}"
+.row-fluid
+	.panel.panel-default
+		.panel-heading
+			%i.fa.fa-gear.fa-fw
+			Info
+		.panel-body
+			.col-md-6
+				%table.table.table-bordered.no-footer
+					%thead
+					%tbody
+						%tr
+							%td
+								%b Name:
+							%td= repo.name
+						%tr
+							%td
+								%b Import path:
+							%td
+								%a{href: repo.import_path}= repo.import_path
+						%tr
+							%td
+								%b Last pull:
+							%td
+								- if repo.last_pull
+									= repo.last_pull
+								- else
+									Never.
+						%tr
+							%td
+								%b Builds:
+							%td
+								%a{href: "/repo/#{repo.name}/builds"}= repo.builds.length
+						%tr
+							%td
+								%b Status:
+							%td
+								- last_build = repo.builds.find {|b| b.status != :working}
+								- if last_build
+									%a{href: "/repo/#{repo.name}/builds/#{last_build.number}"}
+										- case build.status
+										- when :fail
+											%i.fa.fa-warning.fa-fw
+										- when :success
+											%i.fa.fa-check.fa-fw
+										- else
+											%i.fa.fa-gear.fa-fw
+								- else
+									No builds yet.

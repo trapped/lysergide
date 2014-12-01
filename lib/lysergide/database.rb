@@ -24,6 +24,7 @@ module Lysergide
 					table.column :name,			:string
 					table.column :import_path,	:string
 					table.column :user_id,		:integer
+					table.column :last_pull,	:string
 				end
 			end
 
@@ -33,6 +34,7 @@ module Lysergide
 					table.column :user_id,		:integer
 					table.column :number,		:integer
 					table.column :status,		:text
+					table.column :date,			:string
 					table.column :duration,		:integer
 					table.column :ref,			:text
 					table.column :log,			:text
@@ -52,6 +54,15 @@ module Lysergide
 
 		class Build < ActiveRecord::Base
 			belongs_to :repo
+
+			def status
+				super.to_sym
+			end
+			
+			def status=(value)
+				super(value.to_sym)
+				status
+			end
 		end
 	end
 end

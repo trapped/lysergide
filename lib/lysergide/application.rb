@@ -3,6 +3,7 @@ require 'lysergide/database'
 require 'lysergide/errors'
 require 'lysergide/login'
 require 'lysergide/repos'
+require 'lysergide/builds'
 require 'haml'
 
 include Lysergide::Database
@@ -19,6 +20,7 @@ class Lysergide::Application < Sinatra::Base
 	helpers Lysergide::ErrorHelpers
 	use Lysergide::Login
 	use Lysergide::Repos
+	use Lysergide::Builds
 
 	get '/' do
 		if session[:user]
