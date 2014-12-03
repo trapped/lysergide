@@ -25,6 +25,7 @@ module Lysergide
 					table.column :import_path,	:string
 					table.column :user_id,		:integer
 					table.column :last_pull,	:string
+					table.column :pull_interval :integer
 				end
 			end
 
@@ -58,9 +59,9 @@ module Lysergide
 			def status
 				super.to_sym
 			end
-			
+
 			def status=(value)
-				super(value.to_sym)
+				super(value.to_s)
 				status
 			end
 		end
