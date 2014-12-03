@@ -25,7 +25,7 @@ module Lysergide
 					table.column :import_path,	:string
 					table.column :user_id,		:integer
 					table.column :last_pull,	:string
-					table.column :pull_interval :integer
+					table.column :pull_interval,:integer
 				end
 			end
 
