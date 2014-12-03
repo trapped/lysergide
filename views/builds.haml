@@ -9,6 +9,8 @@
 					- repo.builds.each do |build|
 						%a.list-group-item{:href => "/repo/#{build.repo}/builds/#{build.number}"}
 							- case build.status
+							- when :scheduled
+								%i.fa.fa-calendar.fa-fw
 							- when :fail
 								%i.fa.fa-warning.fa-fw
 							- when :success
