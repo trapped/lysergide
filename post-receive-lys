@@ -1,0 +1,6 @@
+#!/bin/bash
+
+LYSERGIDE_URL="http://localhost:3000"
+
+curl --url $LYSERGIDE_URL -d @-
+exit 0
