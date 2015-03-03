@@ -21,6 +21,7 @@ class Lysergide::Application < Sinatra::Base
 	use Lysergide::Login
 	use Lysergide::Repos
 	use Lysergide::Builds
+	use Lysergide::Fisherman
 
 	get '/' do
 		if session[:user]

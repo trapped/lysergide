@@ -2,3 +2,4 @@ terminal.glue
 .sass-cache/
 lysergide.db
 lysergide.sublime-*
+Gemfile.lock

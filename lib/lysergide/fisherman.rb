@@ -1,10 +1,23 @@
-require 'faraday'
-require 'faraday_middleware'
+require 'sinatra/base'
+require 'lysergide/database'
 
-module Fisherman
-	@faraday = Faraday.new(:url => 'https://api.github.com') do |faraday|
-		faraday.request  :json
-		faraday.response :json
-		faraday.adapter  Faraday.default_adapter
+include Lysergide::Database
+
+class Lysergide::Fisherman < Sinatra::Base
+	post '/hook' do
+		repo = Repo.where(name: params[:name], remote: params[:remote]).first
+		if repo
+			params[:refs].split('\n').each do |ref|
+				sref = ref.split ' '
+				new_commit = sref[1]
+				repo.builds.create {
+					number: repo.builds.sort_by(:number).last.number,
+					ref: new_commit,
+					status: "Scheduled"
+				}
+			end
+		else
+			status 400
+		end
 	end
 end
