@@ -4,17 +4,18 @@ require 'lysergide/database'
 include Lysergide::Database
 
 class Lysergide::Fisherman < Sinatra::Base
-	post '/hook' do
-		repo = Repo.where(name: params[:name], remote: params[:remote]).first
+	post '/hook/:hash' do
+		repo = Repo.find(token: headers["X-Lysergide-Token"])
 		if repo
-			params[:refs].split('\n').each do |ref|
+			request.body.rewind
+			request.body.read.split('\n').each do |ref|
 				sref = ref.split ' '
 				new_commit = sref[1]
-				repo.builds.create {
+				repo.builds.create ({
 					number: repo.builds.sort_by(:number).last.number,
 					ref: new_commit,
 					status: "Scheduled"
-				}
+				})
 			end
 		else
 			status 400

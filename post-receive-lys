@@ -1,6 +1,16 @@
 #!/bin/bash
 
+if [ -z $GIT_CONFIG ]; then
+	echo "Do not run this script from the command line."
+	exit 1
+fi
+
+if [ ! git config lysergide.token ]; then
+	echo "Lysergide token not set."
+	exit 1
+fi
+
 LYSERGIDE_URL="http://localhost:3000"
 
-curl --url $LYSERGIDE_URL -d @-
+curl --url "$LYSERGIDE_URL/hook" -H "X-Lysergide-Token: $(git config lysergide.token)" -d @-
 exit 0
