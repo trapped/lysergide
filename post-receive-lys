@@ -10,7 +10,10 @@ if [ ! git config lysergide.token ]; then
 	exit 1
 fi
 
-LYSERGIDE_URL="http://localhost:3000"
+if [ ! git config lysergide.url ]; then
+	echo "Lysergide URL not set."
+	exit 1
+fi
 
-curl --url "$LYSERGIDE_URL/hook" -H "X-Lysergide-Token: $(git config lysergide.token)" -d @-
+curl --url "$(git config lysergide.url)/hook" -H "X-Lysergide-Token: $(git config lysergide.token)" -d @-
 exit 0
