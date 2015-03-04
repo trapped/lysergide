@@ -4,6 +4,7 @@ require 'lysergide/errors'
 require 'lysergide/login'
 require 'lysergide/repos'
 require 'lysergide/builds'
+require 'lysergide/fisherman'
 require 'haml'
 
 include Lysergide::Database
