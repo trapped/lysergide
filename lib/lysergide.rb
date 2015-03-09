@@ -1,7 +1,8 @@
 require 'logger'
 
+LOG = LOG ||= Logger.new($stdout)
+
 module Lysergide
-	LOG = Logger.new($stdout)
 
 	def self.start(port)
 		require 'lysergide/jobs'
