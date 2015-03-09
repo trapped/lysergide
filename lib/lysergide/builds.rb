@@ -16,13 +16,10 @@ class Lysergide::Builds < Sinatra::Base
 	use Lysergide::Errors
 	helpers Lysergide::ErrorHelpers
 
-	before do
+	get '/repo/:name/builds' do |name|
 		unless session[:user]
 			redirect '/login'
 		end
-	end
-
-	get '/repo/:name/builds' do |name|
 		user = User.find(session[:user])
 		repo = user.repos.find_by_name(name)
 		if repo
@@ -37,6 +34,9 @@ class Lysergide::Builds < Sinatra::Base
 	end
 
 	get '/repo/:name/builds/:number' do |name, number|
+		unless session[:user]
+			redirect '/login'
+		end
 		user = User.find(session[:user])
 		repo = user.repos.find_by_name(name) || not_found
 		build = repo.builds.find_by_number(number)

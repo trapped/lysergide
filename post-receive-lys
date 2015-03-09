@@ -1,19 +1,21 @@
 #!/bin/bash
 
-if [ -z $GIT_CONFIG ]; then
+if [ -z $GIT_DIR ]; then
 	echo "Do not run this script from the command line."
 	exit 1
 fi
 
-if [ ! git config lysergide.token ]; then
+if ! git config lysergide.token; then
 	echo "Lysergide token not set."
 	exit 1
 fi
 
-if [ ! git config lysergide.url ]; then
+if ! git config lysergide.url; then
 	echo "Lysergide URL not set."
 	exit 1
 fi
 
-curl --url "$(git config lysergide.url)/hook" -H "X-Lysergide-Token: $(git config lysergide.token)" -d @-
+curl -sS -w "Hook: %{http_code}\r\n" --url "$(git config lysergide.url)/hook" \
+	-H "X-Lysergide-Token: $(git config lysergide.token)" -d @- -o /dev/null
+
 exit 0

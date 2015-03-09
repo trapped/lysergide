@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'lysergide/database'
 require 'lysergide/errors'
+require 'digest'
 require 'haml'
 require 'uri'
 
@@ -52,13 +53,10 @@ class Lysergide::Repos < Sinatra::Base
 		return obj
 	end
 
-	before do
+	get '/repo/:name' do |name|
 		unless session[:user]
 			redirect '/login'
 		end
-	end
-
-	get '/repo/:name' do |name|
 		user = User.find(session[:user])
 		repo = user.repos.find_by_name(name)
 		if repo
@@ -74,6 +72,9 @@ class Lysergide::Repos < Sinatra::Base
 	end
 
 	get '/add/repo' do
+		unless session[:user]
+			redirect '/login'
+		end
 		haml :addrepo, layout: :base, :locals => {
 			title: 'Lysergide CI - Add repo',
 			user: User.find(session[:user]),
@@ -82,6 +83,9 @@ class Lysergide::Repos < Sinatra::Base
 	end
 
 	post '/add/repo' do
+		unless session[:user]
+			redirect '/login'
+		end
 		case
 		when !is_valid_name?(params[:name])
 			status 500
@@ -93,7 +97,8 @@ class Lysergide::Repos < Sinatra::Base
 		if Repo.create(
 			name: params[:name],
 			import_path: params[:import_path],
-			user_id: session[:user])
+			user_id: session[:user],
+			token: Digest::SHA256.hexdigest("#{params[:name]}:#{params[:import_path]}:#{session[:user]}"))
 		then
 			status 200
 			redirect '/'

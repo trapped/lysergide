@@ -7,7 +7,7 @@
 			%i.fa.fa-gear.fa-fw
 			Info
 		.panel-body
-			.col-md-6
+			.col-md-8
 				%table.table.table-bordered.no-footer
 					%thead
 					%tbody
@@ -20,6 +20,11 @@
 								%b Import path:
 							%td
 								%a{href: repo.import_path}= repo.import_path
+						%tr
+							%td
+								%b Hook token:
+							%td
+								= repo.token
 						%tr
 							%td
 								%b Last pull:

@@ -24,6 +24,7 @@ module Lysergide
 					table.column :name,			:string
 					table.column :import_path,	:string
 					table.column :user_id,		:integer
+					table.column :token,		:string
 					table.column :last_pull,	:string
 					table.column :pull_interval,:integer
 				end
@@ -32,7 +33,6 @@ module Lysergide
 			unless ActiveRecord::Base.connection.tables.include? 'builds'
 				create_table :builds do |table|
 					table.column :repo_id,		:integer
-					table.column :user_id,		:integer
 					table.column :number,		:integer
 					table.column :status,		:text
 					table.column :date,			:string
