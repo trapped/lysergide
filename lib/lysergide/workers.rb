@@ -1,30 +1,48 @@
-require 'lysergyde/database'
+require 'lysergide/database'
 
 include Lysergide::Database
 
-class Lysergide::Worker
-	def initialize(id, pool)
-		@id = id
-		@pool = pool
-	end
+module Lysergide
+	class Worker
+		def initialize(id, pool, lock)
+			@id = id
+			@pool = pool
+			@pool_lock = lock
+			LOG.debug("Initialized worker ##{id}")
+		end
 
-	def id
-		@id
-	end
+		def thread
+			@thread
+		end
 
-	# Stores the job (build) id and starts a thread to run it
-	def start(job)
-		@job = job
-	end
+		def thread=(t)
+			@thread = t
+		end
 
-	# Removes the worker itself from the parent worker pool
-	def remove()
-		@pool.delete self
-	end
-	private :remove
+		def id
+			@id
+		end
 
-	# Is the worker done/can it be killed?
-	def done?
-		@done || false
+		# Stores the job (build) id and starts a thread to run it
+		def start(job)
+			@job = job
+			LOG.info("Worker ##{@id}: job ##{job.id} started")
+			job.status = :success
+			job.save
+		end
+
+		# Removes the worker itself from the parent worker pool
+		def remove()
+			@pool_lock.synchronize {
+				@pool.delete self
+			}
+			@thread.kill
+		end
+		private :remove
+
+		# Is the worker done/can it be killed?
+		def done?
+			@done || false
+		end
 	end
 end
