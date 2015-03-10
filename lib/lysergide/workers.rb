@@ -33,9 +33,6 @@ module Lysergide
 		# Stores the job (build) id and starts a thread to run it
 		def start(job)
 			@job = job
-			LOG.info("Worker ##{@id}: job ##{job.id} started")
-			job.status = :success
-			job.save
 			LOG.info("Lysergide::Worker##{@id}") { "Assigned to job ##{job.id}, starting" }
 		end
 
