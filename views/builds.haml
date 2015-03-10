@@ -7,7 +7,7 @@
 			- if repo.builds.length > 0
 				.list-group
 					- repo.builds.each do |build|
-						%a.list-group-item{:href => "/repo/#{build.repo}/builds/#{build.number}"}
+						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
 							- case build.status
 							- when :scheduled
 								%i.fa.fa-calendar.fa-fw

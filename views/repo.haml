@@ -45,7 +45,7 @@
 								- last_build = repo.builds.find {|b| b.status != :working}
 								- if last_build
 									%a{href: "/repo/#{repo.name}/builds/#{last_build.number}"}
-										- case build.status
+										- case last_build.status
 										- when :fail
 											%i.fa.fa-warning.fa-fw
 										- when :success
