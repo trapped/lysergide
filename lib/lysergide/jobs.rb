@@ -17,11 +17,11 @@ module Lysergide
 		# Retrieves the very next scheduled job and removes it from the queue
 		def self.dispatch(worker_id, block = true)
 			@dispatch_lock.synchronize {
-				LOG.info("Dispatching job")
+				LOG.info('Lysergide::Jobs') { 'Dispatching job' }
 				while true
 					next_build = Build.find_by_status(:scheduled)
 					if next_build
-						LOG.debug("Next build: #{next_build.id}")
+						LOG.debug('Lysergide::Jobs') { "Next build: #{next_build.id}" }
 						next_build.status = :working
 						next_build.log = "[Lysergide::Jobs] Assigned to worker ##{worker_id}\n"
 						next_build.save
@@ -40,7 +40,7 @@ module Lysergide
 		# Checks if any worker in the pool is done running its job and eventually removes it
 		def self.clear_pool()
 			@workers_pool_lock.synchronize {
-				LOG.info("Clearing worker pool")
+				LOG.info('Lysergide::Jobs') { 'Clearing worker pool' }
 				@workers_pool.delete_if { |worker| worker.done? }
 			}
 		end
@@ -49,22 +49,22 @@ module Lysergide
 		def self.next_worker()
 			@workers_pool_lock.synchronize {
 				if @workers_pool.length < WORKERS_POOL_SIZE
-					LOG.info("Available workers: #{WORKERS_POOL_SIZE - @workers_pool.length}")
+					LOG.info('Lysergide::Jobs') { "Available workers: #{WORKERS_POOL_SIZE - @workers_pool.length}" }
 					used_ids = @workers_pool.map { |worker| worker.id }
-					LOG.debug("Used worker IDs: #{used_ids.inspect}")
+					LOG.debug('Lysergide::Jobs') { "Used worker IDs: #{used_ids.inspect}" }
 					available_ids = Array.new(WORKERS_POOL_SIZE).fill { |id|
 						used_ids.include?(id) ? nil : id
 					}.delete_if { |elem| elem == nil }
-					LOG.debug("Available worker IDs: #{available_ids.inspect}")
+					LOG.debug('Lysergide::Jobs') { "Available worker IDs: #{available_ids.inspect}" }
 					if available_ids.length > 0
-						LOG.info("Claiming worker")
+						LOG.info('Lysergide::Jobs') { 'Claiming worker' }
 						return Lysergide::Worker.new(available_ids.first, @workers_pool, @workers_pool_lock)
 					else
-						LOG.info("No worker IDs available yet")
+						LOG.info('Lysergide::Jobs') { 'No worker IDs available yet' }
 						return nil
 					end
 				else
-					LOG.info("No workers available yet")
+					LOG.info('Lysergide::Jobs') { 'No workers available yet' }
 					return nil
 				end
 			}
@@ -73,12 +73,12 @@ module Lysergide
 		# Checks for scheduled periodic builds and adds them to the queue; starts workers
 		def self.schedule()
 			clear_pool()
-			LOG.info("Scheduling next job")
+			LOG.info('Lysergide::Jobs') { 'Scheduling next job' }
 			while worker = next_worker
-				LOG.info("Got new worker: #{worker.id}")
+				LOG.info('Lysergide::Jobs') { "Got new worker: #{worker.id}" }
 				job = dispatch worker.id
 				if job
-					LOG.info("Next job ID: #{job.id}")
+					LOG.info('Lysergide::Jobs') { "Next job ID: #{job.id}" }
 					@workers_pool_lock.synchronize {
 						@workers_pool << worker
 					}
@@ -102,7 +102,7 @@ module Lysergide
 
 		# Starts the job scheduler (pulling events and addings jobs) on a separate thread
 		def self.start()
-			LOG.info("Starting Lysergide::Jobs")
+			LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
 			@accept_jobs = true
 			@scheduler_thread = Thread.new {
 				while @accept_jobs
@@ -115,12 +115,13 @@ module Lysergide
 
 		# Stops the job scheduler with quite some violence
 		def self.stop()
-			LOG.info("Stopping Lysergide::Jobs")
-			@accept_jobs = false
-			if @scheduler_thread
-				@scheduler_thread.kill
-				@scheduler_thread = nil
-			end
+			LOG.info('Lysergide::Jobs') { 'Stopping' }
+			ensure
+				@accept_jobs = false
+				if @scheduler_thread
+					@scheduler_thread.kill
+					@scheduler_thread = nil
+				end
 		end
 	end
 end
