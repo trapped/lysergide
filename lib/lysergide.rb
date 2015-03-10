@@ -1,6 +1,6 @@
 require 'logger'
 
-LOG = LOG ||= Logger.new($stdout)
+LOG ||= Logger.new($stdout)
 
 module Lysergide
 
