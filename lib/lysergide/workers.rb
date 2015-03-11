@@ -44,7 +44,11 @@ module Lysergide
 			if status > 0
 				fail "couldn't pull requested repository (#{status.to_s})"
 			end
-			status = run_acid
+			begin
+				status = run_acid
+			rescue Psych::SyntaxError
+				fail "couldn't parse 'acid.yml' or 'lysergide.yml' file, check your syntax (no tabs allowed!)"
+			end
 			case status
 				when 999 then fail "couldn't find either 'acid.yml' or 'lysergide.yml' (#{status.to_s})"
 				when 0  then LOG.info("Lysergide::Worker##{@id}") { "Job ##{@job.id} completed successfully" }
