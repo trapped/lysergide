@@ -2,6 +2,7 @@ require 'lysergide/database'
 require 'acid'
 require 'fileutils'
 require 'stringio'
+require 'colorize'
 
 include Lysergide::Database
 
@@ -104,7 +105,7 @@ module Lysergide
 				end
 				@job.log << @buffer
 				if msg
-					@job.log << "\nError: #{msg}\n"
+					@job.log << "\nError: #{msg}\n".red
 				end
 				@job.save
 				LOG.info("Lysergide::Worker##{@id}")  { "Saved #{@buffer.length} characters to job LOG" }
