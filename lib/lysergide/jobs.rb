@@ -88,7 +88,13 @@ module Lysergide
 					@workers_pool.each do |wrk|
 						if wrk.id == worker.id
 							wrk.thread = Thread.new {
-								wrk.start job
+								begin
+									wrk.start job
+								rescue
+									LOG.error("Lysergide::Worker##{worker.id}") {
+										"Worker thread died: #{$!}\n#{$@}"
+									}
+								end
 							}
 							break
 						end
@@ -126,11 +132,16 @@ module Lysergide
 			LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
 			@accept_jobs = true
 			@scheduler_thread = Thread.new {
-				while @accept_jobs
-					Lysergide::Jobs.schedule()
-					sleep(1)
+				begin
+					while @accept_jobs
+						Lysergide::Jobs.schedule()
+						sleep(1)
+					end
+					@scheduler_thread = nil
+				rescue
+					LOG.error('Lysergide::Jobs') { "Scheduler thread died: #{$!}\n#{$@}" }
+					stop
 				end
-				@scheduler_thread = nil
 			}
 		end
 
