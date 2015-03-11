@@ -100,8 +100,18 @@ module Lysergide
 			end
 		end
 
+		# Resets all jobs marked as 'working' to 'scheduled' so that they can be picked up by dispatch
+		def self.reschedule_blocked()
+			builds = Build.find(:all, conditions: [status: :working])
+			if builds && builds.length > 0
+				LOG.info('Lysergide::Jobs') { "Resetting #{builds.length} jobs" }
+				builds.update_all(status: :scheduled)
+			end
+		end
+
 		# Starts the job scheduler (pulling events and addings jobs) on a separate thread
 		def self.start()
+			reschedule_blocked
 			LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
 			@accept_jobs = true
 			@scheduler_thread = Thread.new {
