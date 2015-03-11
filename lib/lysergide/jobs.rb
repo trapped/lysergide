@@ -109,8 +109,18 @@ module Lysergide
 			end
 		end
 
+		# Removes temporary directories that haven't been cleaned up
+		def self.delete_temp()
+			Dir.chdir(Dir.tmpdir) do
+				Dir.glob('./lysergide*-job*').select { |dir|
+					FileUtils.remove_entry dir
+				}
+			end
+		end
+
 		# Starts the job scheduler (pulling events and addings jobs) on a separate thread
 		def self.start()
+			delete_temp
 			reschedule_blocked
 			LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
 			@accept_jobs = true
