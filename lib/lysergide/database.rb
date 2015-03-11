@@ -56,6 +56,8 @@ module Lysergide
 		class Build < ActiveRecord::Base
 			belongs_to :repo
 
+			default_scope { order(number: :desc) }
+
 			def status
 				super.to_sym
 			end
