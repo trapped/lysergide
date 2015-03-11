@@ -14,19 +14,21 @@
 			- if user.builds.length > 0
 				.list-group
 					- user.builds.each do |build|
-						%a.list-group-item{:href => "/repo/#{build.repo}/builds/#{build.number}"}
+						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
 							- case build.status
-							- when :fail
-								%i.fa.fa-warning.fa-fw
+							- when :scheduled
+								%i.fa.fa-calendar.fa-fw
+							- when :failed
+								%i.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
 							- when :success
-								%i.fa.fa-check.fa-fw
+								%i.fa.fa-check.fa-fw{:style => 'color: green'}
 							- when :working
 								%i.fa.fa-gear.fa-fw
 							- else
 								%i.fa.fa-gear.fa-fw
-							Build
-							%b= build.number
-							%span= build.status
+							= build.repo.name
+							%b.pull-left= "##{build.number}"
+							%span.pull-right= build.status
 							%span.pull-right.text-muted.small
 								%em= build.date
 			- else
