@@ -16,13 +16,17 @@ class Lysergide::Fisherman < Sinatra::Base
 				last_build = repo.builds.order(number: :desc).first
 				number = 1
 				if last_build
-					number = last_build.number
+					number = last_build.number + 1
 				end
-				if repo.builds.create ({
-						number: number,
-						ref: new_commit,
-						status: "scheduled"
-					})
+				new_build = repo.builds.create ({
+					number: number,
+					ref: new_commit,
+					status: "scheduled"
+				})
+				if new_build
+					LOG.info('Lysergide::Fisherman') {
+						"New build (#{new_build.repo.user.name}/#{new_build.repo.name}##{new_build.number}) has been scheduled"
+					}
 					status 200
 				else
 					status 500
