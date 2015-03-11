@@ -36,6 +36,7 @@ module Lysergide
 		def start(job)
 			@job = job
 			LOG.info("Lysergide::Worker##{@id}") { "Assigned to job ##{@job.id}, starting" }
+			@job.date = Time.now
 			# Create temporary directory for the job
 			@dir = Dir.mktmpdir(["lysergide", "-job##{@job.id}"])
 			LOG.info("Lysergide::Worker##{@id}") { "Created temporary directory '#{@dir}'" }
@@ -50,7 +51,6 @@ module Lysergide
 				else         fail "last command returned #{status.inspect}"
 			end
 			@job.status = :success
-			@job.save
 			remove
 		end
 
@@ -69,7 +69,7 @@ module Lysergide
 				]
 				worker = Acid::Worker.new(@id, env, 'bash -c')
 				commands.each do |cmd|
-					status = worker.run cmd, @bufio, @dir
+					status = worker.run cmd, @bufio, @dir, prompt: "lys.#{@id} $ "
 					if status > 0
 						return status
 					end
@@ -83,7 +83,7 @@ module Lysergide
 		def run_acid()
 			if @dir
 				LOG.info("Lysergide::Worker##{@id}") { "Running Acid in '#{@dir}'" }
-				return Acid.start(@id, @dir, @bufio)
+				return Acid.start(@id, @dir, @bufio, cfg: ['acid.yml', 'lysergide.yml'], prompt: "lys.#{@id} $ ")
 			end
 		end
 
@@ -91,6 +91,7 @@ module Lysergide
 		def remove(msg = nil)
 			LOG.info("Lysergide::Worker##{@id}") { 'Removing worker' }
 			ensure
+				@job.duration = (Time.now - @job.date).to_int
 				if @job.status == :working
 					@job.status = :failed
 					LOG.info("Lysergide::Worker##{@id}") { "Job##{@job.id} failed (interrupted)" }

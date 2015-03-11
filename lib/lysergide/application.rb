@@ -5,6 +5,7 @@ require 'lysergide/login'
 require 'lysergide/repos'
 require 'lysergide/builds'
 require 'lysergide/fisherman'
+require 'lysergide/helpers'
 require 'haml'
 
 include Lysergide::Database
@@ -28,6 +29,7 @@ class Lysergide::Application < Sinatra::Base
 		if session[:user]
 			haml :dashboard, layout: :base, :locals => {
 				title: 'Lysergide CI - Dashboard',
+				helpers: Lysergide::Helpers,
 				user: User.find(session[:user])
 			}
 		else
