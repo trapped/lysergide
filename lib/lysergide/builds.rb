@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'lysergide/database'
 require 'lysergide/errors'
+require 'lysergide/helpers'
 require 'haml'
 require 'uri'
 
@@ -25,6 +26,7 @@ class Lysergide::Builds < Sinatra::Base
 		if repo
 			haml :builds, layout: :base, :locals => {
 				title: "Lysergide CI - #{name} - Builds",
+				helpers: Lysergide::Helpers,
 				user: user,
 				repo: repo
 			}
@@ -43,6 +45,7 @@ class Lysergide::Builds < Sinatra::Base
 		if build
 			haml :builddetail, layout: :base, :locals => {
 				title: "Lysergide CI - #{name} - Builds",
+				helpers: Lysergide::Helpers,
 				user: user,
 				repo: repo,
 				build: build
