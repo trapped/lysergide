@@ -119,8 +119,6 @@ module Lysergide
 				}
 			@thread.kill
 		end
-		alias_method :fail, :remove
-		private :remove, :fail
 
 		# Is the worker done/can it be killed?
 		def done?

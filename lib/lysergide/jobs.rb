@@ -92,8 +92,12 @@ module Lysergide
 									wrk.start job
 								rescue
 									LOG.error("Lysergide::Worker##{worker.id}") {
-										"Worker thread died: #{$!}\n#{$@}"
+										"Worker thread died: #{$!}\n#{$@.join "\n"}"
 									}
+								ensure
+									if wrk
+										wrk.fail $1.message.to_s
+									end
 								end
 							}
 							break
