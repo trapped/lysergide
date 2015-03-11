@@ -5,6 +5,7 @@ LOG ||= Logger.new($stdout)
 module Lysergide
 
 	def self.start(port)
+		GC.enable
 		require 'lysergide/jobs'
 		Lysergide::Jobs.start
 		require 'lysergide/application'

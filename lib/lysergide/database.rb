@@ -6,7 +6,7 @@ module Lysergide
 		ActiveRecord::Base.establish_connection ({
 			adapter: 'sqlite3',
 			database: 'lysergide.db',
-			pool: 16
+			pool: 1024
 		})
 
 		# Define the database schema

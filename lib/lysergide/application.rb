@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'active_record'
 require 'lysergide/database'
 require 'lysergide/errors'
 require 'lysergide/login'
@@ -16,7 +17,7 @@ class Lysergide::Application < Sinatra::Base
 	set :public_folder, settings.root + 'static'
 	set :views, settings.root + 'views'
 	enable :static
-	use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => 'lysergide'
+	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
 
 	use Lysergide::Errors
 	helpers Lysergide::ErrorHelpers
@@ -24,6 +25,10 @@ class Lysergide::Application < Sinatra::Base
 	use Lysergide::Repos
 	use Lysergide::Builds
 	use Lysergide::Fisherman
+
+	after do
+		ActiveRecord::Base.clear_active_connections!
+	end
 
 	get '/' do
 		if session[:user]
