@@ -1,5 +1,9 @@
 module Lysergide::Helpers
 	def self.duration(num)
+		if num == nil
+			# Old builds didn't support date/duration
+			return ''
+		end
 		secs  = num.to_int
 		mins  = secs / 60
 		hours = mins / 60
