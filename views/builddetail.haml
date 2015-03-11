@@ -1,0 +1,19 @@
+.row
+	.col-md-12
+		%h1.page-header= "#{user.name}/#{repo.name}##{build.number}"
+.row-fluid
+	.panel.panel-default
+		.panel-heading
+			- case build.status
+			- when :failed
+				.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
+				failing
+			- when :success
+				%i.fa.fa-check.fa-fw{:style => 'color: green'}
+				succeeding
+			- else
+				%i.fa.fa-gear.fa-fw
+				working
+		.panel-body
+			.col-md-8
+				%code= build.log

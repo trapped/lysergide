@@ -41,7 +41,7 @@ class Lysergide::Builds < Sinatra::Base
 		repo = user.repos.find_by_name(name) || not_found
 		build = repo.builds.find_by_number(number)
 		if build
-			haml :build_detail, layout: :base, :locals => {
+			haml :builddetail, layout: :base, :locals => {
 				title: "Lysergide CI - #{name} - Builds",
 				user: user,
 				repo: repo,
