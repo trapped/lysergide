@@ -17,5 +17,5 @@
 		.panel-body
 			.col-md-8
 				%pre{:id => 'build-log', :style => 'width: 100%'}= build.log
-				%script{:src => 'https://raw.githubusercontent.com/drudru/ansi_up/master/ansi_up.js', :type => 'text/javascript'}
+				%script{:src => '/js/ansi_up.js'}
 				%script{:type => 'text/javascript'}= "var log = document.getElementById('build-log');log.innerHTML = ansi_up.ansi_to_html(log.innerHTML);"
