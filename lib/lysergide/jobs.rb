@@ -102,7 +102,7 @@ module Lysergide
 
 		# Resets all jobs marked as 'working' to 'scheduled' so that they can be picked up by dispatch
 		def self.reschedule_blocked()
-			builds = Build.find(:all, conditions: [status: :working])
+			builds = Build.where(status: :working)
 			if builds && builds.length > 0
 				LOG.info('Lysergide::Jobs') { "Resetting #{builds.length} jobs" }
 				builds.update_all(status: :scheduled)
