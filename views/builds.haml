@@ -22,9 +22,9 @@
 							Build
 							%b= "##{build.number}"
 							%span= build.status
-							%span.pull-right.text-muted.small
+							%span.pull-right.text-muted.small{:style => 'padding-left: 2em'}
 								%em= build.ref
-							%span.pull-right.text-muted.small
+							%span.pull-right.text-muted.small{:style => 'padding-left: 2em'}
 								%em= helpers.duration(build.duration)
 							%span.pull-right.text-muted.small
 								%em= build.date
