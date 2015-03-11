@@ -113,6 +113,7 @@ module Lysergide
 		def self.delete_temp()
 			Dir.chdir(Dir.tmpdir) do
 				Dir.glob('./lysergide*-job*').select { |dir|
+					LOG.info('Lysergide::Jobs') { "Removing '#{File.join(Dir.tmpdir, dir)}'" }
 					FileUtils.remove_entry dir
 				}
 			end
