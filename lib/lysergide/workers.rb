@@ -74,7 +74,7 @@ module Lysergide
 				]
 				worker = Acid::Worker.new(@id, env, 'bash -c')
 				commands.each do |cmd|
-					status = worker.run cmd, @bufio, @dir, prompt: "lys.#{@id} $ "
+					status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ "
 					if status > 0
 						return status
 					end
