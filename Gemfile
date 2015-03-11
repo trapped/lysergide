@@ -9,4 +9,6 @@ gem 'haml'
 gem 'acid', :git => 'https://github.com/trapped/acid'
 gem 'activerecord'
 gem 'colorize'
-gem 'byebug'
+group :development do
+	gem 'byebug'
+end
