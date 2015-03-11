@@ -48,7 +48,13 @@ module Lysergide
 			begin
 				status = run_acid
 			rescue Psych::SyntaxError
-				fail "couldn't parse 'acid.yml' or 'lysergide.yml' file, check your syntax (no tabs allowed!)"
+				fail "couldn't parse neither 'acid.yml' nor 'lysergide.yml', check your syntax (no tabs allowed!)"
+			rescue ArgumentError
+				if $!.message == 'wrong first argument'
+					fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
+				else
+					next
+				end
 			rescue
 				fail $!.message.to_s
 			end
