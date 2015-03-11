@@ -91,7 +91,7 @@ module Lysergide
 		def remove(msg = nil)
 			LOG.info("Lysergide::Worker##{@id}") { 'Removing worker' }
 			ensure
-				@job.duration = (Time.now - @job.date).to_int
+				@job.duration = (Time.now - Time.parse(@job.date)).to_int
 				if @job.status == :working
 					@job.status = :failed
 					LOG.info("Lysergide::Worker##{@id}") { "Job##{@job.id} failed (interrupted)" }
