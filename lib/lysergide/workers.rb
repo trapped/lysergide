@@ -49,6 +49,8 @@ module Lysergide
 				status = run_acid
 			rescue Psych::SyntaxError
 				fail "couldn't parse 'acid.yml' or 'lysergide.yml' file, check your syntax (no tabs allowed!)"
+			rescue
+				fail $!.message.to_s
 			end
 			case status
 				when 999 then fail "couldn't find either 'acid.yml' or 'lysergide.yml' (#{status.to_s})"
