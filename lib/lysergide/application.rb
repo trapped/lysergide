@@ -10,7 +10,7 @@ require 'haml'
 include Lysergide::Database
 
 class Lysergide::Application < Sinatra::Base
-	set :server, :webrick
+	set :server, :thin
 	set :root, File.dirname(__FILE__) + '/../../'
 	set :public_folder, settings.root + 'static'
 	set :views, settings.root + 'views'
