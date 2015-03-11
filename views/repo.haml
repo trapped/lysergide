@@ -46,10 +46,11 @@
 								- if last_build
 									%a{href: "/repo/#{repo.name}/builds/#{last_build.number}"}
 										- case last_build.status
-										- when :fail
-											%i.fa.fa-warning.fa-fw
+										- when :failed
+											.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
+											failing
 										- when :success
-											%i.fa.fa-check.fa-fw
+											%i.fa.fa-check.fa-fw{:style => 'color: green'}
 										- else
 											%i.fa.fa-gear.fa-fw
 								- else

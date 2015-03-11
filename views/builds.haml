@@ -11,10 +11,10 @@
 							- case build.status
 							- when :scheduled
 								%i.fa.fa-calendar.fa-fw
-							- when :fail
-								%i.fa.fa-warning.fa-fw
+							- when :failed
+								%i.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
 							- when :success
-								%i.fa.fa-check.fa-fw
+								%i.fa.fa-check.fa-fw{:style => 'color: green'}
 							- when :working
 								%i.fa.fa-gear.fa-fw
 							- else
