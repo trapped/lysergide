@@ -33,6 +33,7 @@ module Lysergide
 			unless ActiveRecord::Base.connection.tables.include? 'builds'
 				create_table :builds do |table|
 					table.column :repo_id,		:integer
+					table.column :user_id,		:integer
 					table.column :number,		:integer
 					table.column :status,		:text
 					table.column :date,			:string
