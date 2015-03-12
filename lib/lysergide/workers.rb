@@ -52,9 +52,8 @@ module Lysergide
 			rescue ArgumentError
 				if $!.message == 'wrong first argument'
 					fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
-				else
-					next
 				end
+				fail $!.message.to_s
 			rescue
 				fail $!.message.to_s
 			end
@@ -102,7 +101,7 @@ module Lysergide
 
 		# Removes the worker itself from the parent worker pool
 		def remove(msg = nil)
-			LOG.info("Lysergide::Worker##{@id}") { 'Removing worker' }
+			LOG.info("Lysergide::Worker##{@id}") { "Removing worker" }
 			ensure
 				@job.duration = (Time.now - Time.parse(@job.date)).to_int
 				if @job.status == :working
@@ -116,7 +115,7 @@ module Lysergide
 					@job.log << "\nError: #{msg}\n".red
 				end
 				@job.save
-				LOG.info("Lysergide::Worker##{@id}")  { "Saved #{@buffer.length} characters to job LOG" }
+				LOG.info("Lysergide::Worker##{@id}")  { "Saved #{@buffer.length} characters to job log" }
 				if @dir
 					FileUtils.remove_entry @dir
 					LOG.info("Lysergide::Worker##{@id}") { 'Removed temporary directory' }
@@ -126,7 +125,9 @@ module Lysergide
 					@pool.delete self
 				}
 			@thread.kill
+			return nil
 		end
+		alias_method :fail, :remove
 
 		# Is the worker done/can it be killed?
 		def done?

@@ -90,14 +90,15 @@ module Lysergide
 							wrk.thread = Thread.new {
 								begin
 									wrk.start job
-								rescue
-									LOG.error("Lysergide::Worker##{worker.id}") {
-										"Worker thread died: #{$!}\n#{$@.join "\n"}"
-									}
-								ensure
-									if wrk
-										wrk.fail $1.message.to_s
+								rescue SystemExit
+									if !wrk.done?
+										LOG.error("Lysergide::Worker##{wrk.id}") {
+											"Worker thread died: #{$!}\n#{$@.join "\n"}"
+										}
+										wrk.fail $!.message.to_s
 									end
+								ensure
+									wrk = nil
 								end
 							}
 							break
@@ -133,6 +134,9 @@ module Lysergide
 		def self.start()
 			delete_temp
 			reschedule_blocked
+			if !Thread.abort_on_exception
+				Thread.abort_on_exception = true
+			end
 			LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
 			@accept_jobs = true
 			@scheduler_thread = Thread.new {
