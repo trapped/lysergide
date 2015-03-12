@@ -81,7 +81,7 @@ module Lysergide
 				]
 				worker = Acid::Worker.new(@id, env, 'bash -c')
 				commands.each do |cmd|
-					status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ "
+					status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ ".bold
 					if status > 0
 						return status
 					end
@@ -95,7 +95,7 @@ module Lysergide
 		def run_acid()
 			if @dir
 				LOG.info("Lysergide::Worker##{@id}") { "Running Acid in '#{@dir}'" }
-				return Acid.start(@id, @dir, @bufio, cfg: ['acid.yml', 'lysergide.yml'], prompt: "lys.#{@id} $ ")
+				return Acid.start(@id, @dir, @bufio, cfg: ['acid.yml', 'lysergide.yml'], prompt: "lys.#{@id} $ ".bold)
 			end
 		end
 
