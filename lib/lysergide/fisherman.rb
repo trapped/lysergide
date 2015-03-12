@@ -27,7 +27,7 @@ class Lysergide::Fisherman < Sinatra::Base
 					user_id: repo.user.id,
 					number: number,
 					ref: new_commit,
-					status: "scheduled"
+					status: :scheduled
 				})
 				if new_build
 					LOG.info('Lysergide::Fisherman') {
@@ -56,7 +56,7 @@ class Lysergide::Fisherman < Sinatra::Base
 		when 'push'
 			commits = gh_payload['commits']
 			gh_repo = gh_payload['repository']
-			repos = Repo.where(remote: [gh_repo['url'], gh_repo['clone_url'], gh_repo['git_url'], gh_repo['ssh_url']])
+			repos = Repo.where(import_path: [gh_repo['url'], gh_repo['clone_url'], gh_repo['git_url'], gh_repo['ssh_url']])
 			repos.each do |repo|
 				unique_signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), repo.token, body)
 				if Rack::Utils.secure_compare(unique_signature, request.env['HTTP_X_HUB_SIGNATURE'])
@@ -74,7 +74,7 @@ class Lysergide::Fisherman < Sinatra::Base
 							user_id: repo.user.id,
 							number: number,
 							ref: new_commit,
-							status: scheduled
+							status: :scheduled
 						})
 						if new_build
 							LOG.info('Lysergide::Fisherman') {
