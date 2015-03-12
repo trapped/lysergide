@@ -54,6 +54,11 @@ module Lysergide
 					fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
 				end
 				fail $!.message.to_s
+			rescue NoMethodError
+				if $!.message.start_with?("undefined method `merge'")
+					fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
+				end
+				fail $!.message.to_s
 			rescue
 				fail $!.message.to_s
 			end
