@@ -4,6 +4,7 @@ require 'lysergide/database'
 include Lysergide::Database
 
 class Lysergide::Fisherman < Sinatra::Base
+	# Default (post-receive-lys) hook
 	post '/hook' do
 		# The header is actually X-Lysergide-Token
 		repo = Repo.find_by_token(request.env["HTTP_X_LYSERGIDE_TOKEN"])
@@ -18,7 +19,8 @@ class Lysergide::Fisherman < Sinatra::Base
 				if last_build
 					number = last_build.number + 1
 				end
-				new_build = repo.builds.create ({
+				new_build = repo.builds.create({
+					user_id: repo.user.id,
 					number: number,
 					ref: new_commit,
 					status: "scheduled"
