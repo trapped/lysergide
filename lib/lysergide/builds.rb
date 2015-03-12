@@ -12,7 +12,6 @@ class Lysergide::Builds < Sinatra::Base
 	set :public_folder, settings.root + '/static'
 	set :views, settings.root + '/views'
 	enable :static
-	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
 
 	use Lysergide::Errors
 	helpers Lysergide::ErrorHelpers
