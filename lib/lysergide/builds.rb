@@ -53,4 +53,20 @@ class Lysergide::Builds < Sinatra::Base
 			not_found
 		end
 	end
+
+	get '/repo/:name/builds/:number/retry' do |name, number|
+		unless session[:user]
+			redirect '/login'
+		end
+		user = User.find(session[:user])
+		repo = user.repos.find_by_name(name) || redirect("/repo/#{name}/builds/#{number}")
+		build = repo.builds.find_by_number(number)
+		if build
+			build.status = :scheduled
+			build.save
+			redirect "/repo/#{name}/builds/#{number}"
+		else
+			redirect "/repo/#{name}/builds/#{number}"
+		end
+	end
 end
