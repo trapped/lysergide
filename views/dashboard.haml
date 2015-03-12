@@ -13,7 +13,7 @@
 		.panel-body
 			- if user.builds.length > 0
 				.list-group
-					- user.builds.each do |build|
+					- user.builds.reorder(id: :desc).each do |build|
 						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
 							- case build.status
 							- when :scheduled
@@ -28,7 +28,6 @@
 								%i.fa.fa-gear.fa-fw
 							= build.repo.name
 							%b.pull-left= "##{build.number}"
-							%span.pull-right= build.status
 							%span.pull-right.text-muted.small
 								%em= build.date
 			- else
