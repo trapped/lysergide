@@ -4,7 +4,7 @@ require 'thread'
 
 include Lysergide::Database
 
-WORKERS_POOL_SIZE = 2
+WORKERS_POOL_SIZE = ENV['LYS_WORKER_POOL_SIZE'] || 2
 
 module Lysergide
 	module Jobs
