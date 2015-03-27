@@ -25,6 +25,13 @@ class Lysergide::Application < Sinatra::Base
 	use Lysergide::Builds
 	use Lysergide::Fisherman
 
+	before do
+		LOG.info("Lysergide") {
+			"#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
+			"#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
+		}
+	end
+
 	after do
 		ActiveRecord::Base.clear_active_connections!
 	end
