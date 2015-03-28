@@ -7,6 +7,18 @@ require 'rack/utils'
 include Lysergide::Database
 
 class Lysergide::Fisherman < Sinatra::Base
+	# Seems like the before/after filters from Lysergide::Application either don't work with POST or they don't reach here
+	before do
+		LOG.info("Lysergide") {
+			"#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
+			"#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
+		}
+	end
+
+	after do
+		ActiveRecord::Base.clear_active_connections!
+	end
+
 	# Default (post-receive-lys) hook
 	post '/hook' do
 		request.session_options[:skip] = true
