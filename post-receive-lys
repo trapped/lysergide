@@ -15,7 +15,7 @@ if ! git config lysergide.url; then
 	exit 1
 fi
 
-curl -sS -w "Hook: %{http_code}\r\n" --url "$(git config lysergide.url)/hook" \
-	-H "X-Lysergide-Token: $(git config lysergide.token)" -d @- -o /dev/null
+pee 'curl -sS -w "Hook: %{http_code}\r\n" --url "$(git config lysergide.url)/hook" \
+	-H "X-Lysergide-Token: $(git config lysergide.token)" -d @- -o /dev/null'
 
 exit 0
