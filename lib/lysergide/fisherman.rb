@@ -35,10 +35,12 @@ class Lysergide::Fisherman < Sinatra::Base
 					}
 					status 200
 				else
+					LOG.error('Lysergide::Fisherman') { "Internal error on repo.builds.create (standard hook)" }
 					status 500
 				end
 			end
 		else
+			LOG.error('Lysergide::Fisherman') { "No matching repo found for token #{request.env['HTTP_X_LYSERGIDE_TOKEN']}" }
 			status 400
 		end
 	end
@@ -63,6 +65,7 @@ class Lysergide::Fisherman < Sinatra::Base
 					commits.each do |commit|
 						new_commit = commit['sha'] || commit['id']
 						if !new_commit || new_commit.empty?
+							LOG.error('Lysergide::Fisherman') { "Couldn't get the commit SHA or id from JSON (GitHub hook)" }
 							halt 500
 						end
 						last_build = repo.builds.order(number: :desc).first
@@ -82,12 +85,14 @@ class Lysergide::Fisherman < Sinatra::Base
 							}
 							halt 200
 						else
+							LOG.error('Lysergide::Fisherman') { "Internal error on repo.builds.create (GitHub hook)" }
 							halt 500
 						end
 					end
 				end
 			end
 		else
+			LOG.error('Lysergide::Fisherman') { "Unhandled GitHub hook event: #{request.env['HTTP_X_GITHUB_EVENT']}" }
 			halt 400
 		end
 	end
