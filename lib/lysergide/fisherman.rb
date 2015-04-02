@@ -27,7 +27,7 @@ class Lysergide::Fisherman < Sinatra::Base
 		if repo
 			request.body.rewind
 			body = request.body.read
-			body.split('\n').each do |ref|
+			body.split('\n').each do |ref| # reverse chronological order
 				sref = ref.split(' ')
 				new_commit = sref[1]
 				last_build = repo.builds.order(number: :desc).first
@@ -45,7 +45,7 @@ class Lysergide::Fisherman < Sinatra::Base
 					LOG.info('Lysergide::Fisherman') {
 						"New build (#{new_build.repo.user.name}/#{new_build.repo.name}##{new_build.number}) has been scheduled"
 					}
-					status 200
+					status 200 # TODO: only the latest commit?
 				else
 					LOG.error('Lysergide::Fisherman') { "Internal error on repo.builds.create (standard hook)" }
 					status 500
