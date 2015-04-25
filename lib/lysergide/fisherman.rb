@@ -71,6 +71,10 @@ class Lysergide::Fisherman < Sinatra::Base
 			commits = gh_payload['commits']
 			gh_repo = gh_payload['repository']
 			repos = Repo.where(import_path: [gh_repo['url'], gh_repo['clone_url'], gh_repo['git_url'], gh_repo['ssh_url']])
+			if !repos || repos.empty?
+				LOG.error('Lysergide::Fisherman') { "No matching repo for '#{gh_repo['url']}'"}
+				halt 400
+			end
 			repos.each do |repo|
 				unique_signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), repo.token, body)
 				if Rack::Utils.secure_compare(unique_signature, request.env['HTTP_X_HUB_SIGNATURE'])
@@ -78,7 +82,7 @@ class Lysergide::Fisherman < Sinatra::Base
 						new_commit = commit['sha'] || commit['id']
 						if !new_commit || new_commit.empty?
 							LOG.error('Lysergide::Fisherman') { "Couldn't get the commit SHA or id from JSON (GitHub hook)" }
-							halt 500
+							halt 400
 						end
 						last_build = repo.builds.order(number: :desc).first
 						number = 1
