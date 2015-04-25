@@ -16,7 +16,7 @@ class Lysergide::Application < Sinatra::Base
 	set :root, File.dirname(__FILE__) + '/../../'
 	set :public_folder, settings.root + 'static'
 	set :views, settings.root + 'views'
-	enable :static
+	enable :static, :dump_errors
 
 	use Lysergide::Errors
 	helpers Lysergide::ErrorHelpers
