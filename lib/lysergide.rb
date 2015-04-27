@@ -3,7 +3,6 @@ require 'logger'
 LOG ||= Logger.new($stdout)
 
 module Lysergide
-
 	def self.start(port)
 		GC.enable
 		require 'lysergide/jobs'

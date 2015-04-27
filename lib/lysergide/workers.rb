@@ -3,6 +3,7 @@ require 'acid'
 require 'fileutils'
 require 'stringio'
 require 'colorize'
+require 'timeout'
 
 include Lysergide::Database
 
@@ -43,7 +44,10 @@ module Lysergide
 			LOG.info("Lysergide::Worker##{@id}") { "Created temporary directory '#{@dir}'" }
 			status = pull_ref
 			if status > 0
-				fail "couldn't pull requested repository (#{status.to_s})"
+				fail "couldn't pull requested repository (#{status.to_s})" + case status
+				when 999 then "- 'git pull' timed out (2 minutes). are you sure the repository isn't private?"
+				else          ''
+				end
 			end
 			begin
 				status = run_acid
@@ -64,8 +68,8 @@ module Lysergide
 			end
 			case status
 				when 999 then fail "couldn't find either 'acid.yml' or 'lysergide.yml' (#{status.to_s})"
-				when 0  then LOG.info("Lysergide::Worker##{@id}") { "Job ##{@job.id} completed successfully" }
-				else         fail "last command returned #{status.inspect}"
+				when 0   then LOG.info("Lysergide::Worker##{@id}") { "Job ##{@job.id} completed successfully" }
+				else          fail "last command returned #{status.inspect}"
 			end
 			@job.status = :success
 			remove
@@ -85,13 +89,19 @@ module Lysergide
 					"git reset --hard #{@job.ref}"
 				]
 				worker = Acid::Worker.new(@id, env, 'bash -c')
-				commands.each do |cmd|
-					status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ ".bold
-					if status > 0
-						return status
+				begin
+					Timeout.timeout(2 * 60) do
+						commands.each do |cmd|
+							status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ ".bold
+							if status > 0
+								return status
+							end
+						end
+						return 0
 					end
+				rescue Timeout::Error
+					return 999
 				end
-				return 0
 			end
 		end
 		private :pull_ref
