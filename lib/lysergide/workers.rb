@@ -81,8 +81,8 @@ module Lysergide
 					"PAGER" => 'cat'
 				}
 				commands = [
-					"git clone '#{@job.repo.import_path}' .",
-					"git reset --hard '#{@job.ref}'"
+					"git clone #{@job.repo.import_path} .",
+					"git reset --hard #{@job.ref}"
 				]
 				worker = Acid::Worker.new(@id, env, 'bash -c')
 				commands.each do |cmd|
