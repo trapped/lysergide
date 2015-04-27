@@ -119,9 +119,7 @@ class Lysergide::Hooks < Sinatra::Base
 	post '/hook/bitbucket' do
 		# Disable cookies for this request
 		request.session_options[:skip] = true
-		request.body.rewind
-		body = request.body.read
-		bb_payload = JSON.parse(body)
+		bb_payload = JSON.parse(params[:payload])
 		repo_url = "#{bb_payload['canon_url']}/#{bb_payload['repository']['owner']}/#{bb_payload['repository']['name']}"
 		repos = Repo.where(import_path: repo_url)
 		if !repos || repos.empty?
