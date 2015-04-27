@@ -21,6 +21,7 @@ class Lysergide::Hooks < Sinatra::Base
 
 	# Default (post-receive-lys) hook
 	post '/hook' do
+		# Disable cookies for this request
 		request.session_options[:skip] = true
 		# The header is actually X-Lysergide-Token
 		repo = Repo.find_by_token(request.env["HTTP_X_LYSERGIDE_TOKEN"])
@@ -59,6 +60,7 @@ class Lysergide::Hooks < Sinatra::Base
 
 	# GitHub (JSON) hook
 	post '/hook/github' do
+		# Disable cookies for this request
 		request.session_options[:skip] = true
 		request.body.rewind
 		body = request.body.read
@@ -110,6 +112,51 @@ class Lysergide::Hooks < Sinatra::Base
 		else
 			LOG.error('Lysergide::Hooks') { "Unhandled GitHub hook event: #{request.env['HTTP_X_GITHUB_EVENT']}" }
 			halt 400
+		end
+	end
+
+	# BitBucket (unsigned JSON) hook
+	post '/hook/bitbucket' do
+		# Disable cookies for this request
+		request.session_options[:skip] = true
+		request.body.rewind
+		body = request.body.read
+		bb_payload = JSON.parse(body)
+		repo_url = "#{bb_payload['canon_url']}/#{bb_payload['repository']['owner']}/#{bb_payload['repository']['name']}"
+		repos = Repo.where(import_path: repo_url)
+		if !repos || repos.empty?
+			LOG.error('Lysergide::Hooks') { "No matching repo for '#{repo_url}'"}
+			halt 400, {'Content-Type' => 'text/plain'}, 'No matching repo'
+		end
+		repos.each do |repo|
+			commits = bb_payload['commits']
+			commits.each do |commit|
+				new_commit = commit['raw_node']
+				if !new_commit || new_commit.empty?
+					LOG.error('Lysergide::Hooks') { "Couldn't get the commit raw node from JSON (BitBucket hook)" }
+					halt 400, {'Content-Type' => 'text/plain'}, 'Couldn\'t get commit raw node from JSON'
+				end
+				last_build = repo.builds.order(number: :desc).first
+				number = 1
+				if last_build
+					number = last_build.number + 1
+				end
+				new_build = repo.builds.create({
+					user_id: repo.user.id,
+					number: number,
+					ref: new_commit,
+					status: :scheduled
+				})
+				if new_build
+					LOG.info('Lysergide::Hooks') {
+						"New build (#{new_build.repo.user.name}/#{new_build.repo.name}##{new_build.number}) has been scheduled"
+					}
+					halt 200
+				else
+					LOG.error('Lysergide::Hooks') { "Internal error on repo.builds.create (BitBucket hook)" }
+					halt 500
+				end
+			end
 		end
 	end
 end
