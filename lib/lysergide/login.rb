@@ -11,6 +11,14 @@ class Lysergide::Login < Sinatra::Base
 	enable :static
 	use Rack::Session::Cookie, :key => 'lysergide.session', :path => '/', :secret => 'lysergide'
 
+	# Seems like the before/after filters from Lysergide::Application either don't work with POST or they don't reach here
+	before do
+		LOG.info("Lysergide") {
+			"#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
+			"#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
+		}
+	end
+
 	get '/login' do
 		if session[:user]
 			redirect '/'

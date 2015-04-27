@@ -16,6 +16,14 @@ class Lysergide::Repos < Sinatra::Base
 	use Lysergide::Errors
 	helpers Lysergide::ErrorHelpers
 
+	# Seems like the before/after filters from Lysergide::Application either don't work with POST or they don't reach here
+	before do
+		LOG.info("Lysergide") {
+			"#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
+			"#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
+		}
+	end
+
 	def is_valid_name?(name)
 		(name =~ /\A\p{Alnum}+\z/) != nil
 	end
