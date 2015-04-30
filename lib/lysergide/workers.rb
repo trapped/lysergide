@@ -91,13 +91,15 @@ module Lysergide
 				worker = Acid::Worker.new(@id, env, 'bash -c')
 				begin
 					Timeout.timeout(2 * 60) do
-						commands.each do |cmd|
-							status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ ".bold
-							if status > 0
-								return status
+						return Thread.new {
+							commands.each do |cmd|
+								status = worker.run cmd, @bufio, @dir, "lys.#{@id} $ ".bold
+								if status > 0
+									return status
+								end
 							end
-						end
-						return 0
+							return 0
+						}.value
 					end
 				rescue Timeout::Error
 					worker.kill
