@@ -100,6 +100,7 @@ module Lysergide
 						return 0
 					end
 				rescue Timeout::Error
+					worker.kill
 					return 999
 				end
 			end
