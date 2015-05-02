@@ -12,7 +12,7 @@
 			Builds
 		.panel-body
 			- if user.builds.length > 0
-				.list-group
+				.list-group.lys-builds
 					- user.builds.reorder(id: :desc).first(50).each do |build|
 						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
 							- case build.status
