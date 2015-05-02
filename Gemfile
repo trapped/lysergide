@@ -4,6 +4,7 @@ gemspec
 
 gem 'sinatra'
 gem 'thin'
+gem 'sinatra-websocket'
 gem 'sqlite3'
 gem 'haml'
 gem 'acid', :git => 'https://github.com/trapped/acid'
