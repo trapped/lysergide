@@ -11,7 +11,11 @@ module Lysergide::RealtimePool
   end
 
   def self.pop()
-    @queue.pop
+    begin
+      @queue.pop true
+    rescue
+      nil
+    end
   end
 
   def self.push(i)
