@@ -105,7 +105,7 @@ class Lysergide::Realtime < Sinatra::Base
                   end
                 end
               else
-                sleep 1
+                sleep 10
               end
               LOG.debug('Lysergide::Realtime') { 'Sending keepalive' }
               keepalive_count = 0
