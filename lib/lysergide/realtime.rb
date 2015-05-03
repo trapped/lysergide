@@ -103,6 +103,9 @@ class Lysergide::Realtime < Sinatra::Base
               else
                 sleep 1
               end
+              settings.wsockets.each do |s, d|
+                s.send({type: :keepalive}.to_json)
+              end
             end
           end
         end

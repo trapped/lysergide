@@ -83,10 +83,11 @@ lys.handle = function(data) {
     this.initialized = true;
   } else {
     switch(data.type) {
-      case 'error':   console.log('error:', data.err, data.msg); break;
-      case 'success': console.log('success:', data.msg); break;
-      case 'msg':     lys.handleEvent(data); break;
-      default:        console.log('unknown msg type', data.type);
+      case 'error':     console.log('error:', data.err, data.msg); break;
+      case 'success':   console.log('success:', data.msg); break;
+      case 'msg':       lys.handleEvent(data); break;
+      case 'keepalive': console.log('keepalive'); break;
+      default:          console.log('unknown msg type', data.type);
     }
   }
 };
