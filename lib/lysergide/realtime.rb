@@ -103,8 +103,11 @@ class Lysergide::Realtime < Sinatra::Base
               else
                 sleep 1
               end
+              LOG.debug('Lysergide::Realtime') { 'Sending keepalive' }
+              keepalive_count = 0
               settings.wsockets.each do |s, d|
                 s.send({type: :keepalive}.to_json)
+                keepalive_count = keepalive_count + 1
               end
             end
           end
