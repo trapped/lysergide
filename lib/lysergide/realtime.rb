@@ -107,13 +107,15 @@ class Lysergide::Realtime < Sinatra::Base
               else
                 sleep 10
               end
-              LOG.debug('Lysergide::Realtime') { 'Sending keepalive' }
-              keepalive_count = 0
-              settings.wsockets.each do |s, d|
-                s.send({type: :keepalive}.to_json)
-                keepalive_count = keepalive_count + 1
+              if settings.wsockets.length > 0
+                LOG.debug('Lysergide::Realtime') { 'Sending keepalive' }
+                keepalive_count = 0
+                settings.wsockets.each do |s, d|
+                  s.send({type: :keepalive}.to_json)
+                  keepalive_count = keepalive_count + 1
+                end
+                LOG.debug('Lysergide::Realtime') { "Sent #{keepalive_count} keepalive#{keepalive_count == 1 ? '' : 's'}" }
               end
-              LOG.debug('Lysergide::Realtime') { "Sent #{keepalive_count} keepalive#{keepalive_count == 1 ? '' : 's'}" }
             end
           end
         end
