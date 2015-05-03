@@ -113,6 +113,7 @@ class Lysergide::Realtime < Sinatra::Base
                 s.send({type: :keepalive}.to_json)
                 keepalive_count = keepalive_count + 1
               end
+              LOG.debug('Lysergide::Realtime') { "Sent #{keepalive_count} keepalive#{keepalive_count == 1 ? '' : 's'}" }
             end
           end
         end
