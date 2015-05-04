@@ -100,7 +100,7 @@ lys.setupWs = function() {
       lys.ws.send('sub builds');
     }
   };
-  lys.ws.onclose   = function()  { console.log('websocket closed, reconnecting in 3s'); setTimeout(lys.setupWs, 3000); };
+  lys.ws.onclose   = function()  { console.log('websocket closed, reconnecting in 3s'); lys.initialized = false; setTimeout(lys.setupWs, 3000); };
   lys.ws.onmessage = function(m) { lys.handle(JSON.parse(m.data)); };
 };
 
