@@ -93,7 +93,7 @@ lys.handle = function(data) {
 };
 
 window.addEventListener('load', function() {
-  lys.ws           = new WebSocket('ws' + (window.location.protocol == 'https' ? 's' : '') + '://' + window.location.host + '/realtime');
+  lys.ws           = new WebSocket('ws' + (window.location.protocol == 'https:' ? 's' : '') + '://' + window.location.host + '/realtime');
   lys.ws.onopen    = function()  {
     console.log('websocket opened');
     if(document.getElementsByClassName('lys-builds').length > 0) {
