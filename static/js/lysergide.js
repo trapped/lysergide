@@ -92,7 +92,7 @@ lys.handle = function(data) {
   }
 };
 
-window.addEventListener('load', function() {
+lys.setupWs = function() {
   lys.ws           = new WebSocket('ws' + (window.location.protocol == 'https:' ? 's' : '') + '://' + window.location.host + '/realtime');
   lys.ws.onopen    = function()  {
     console.log('websocket opened');
@@ -100,6 +100,10 @@ window.addEventListener('load', function() {
       lys.ws.send('sub builds');
     }
   };
-  lys.ws.onclose   = function()  { console.log('websocket closed'); };
+  lys.ws.onclose   = function()  { console.log('websocket closed, reconnecting in 3s'); setTimeout(lys.setupWs, 3000); };
   lys.ws.onmessage = function(m) { lys.handle(JSON.parse(m.data)); };
+};
+
+window.addEventListener('load', function() {
+  lys.setupWs();
 });
