@@ -35,6 +35,9 @@ lys.fa_icon = function(e) {
 
 lys.handleEvent = function(e) {
   switch(e.msg.type) {
+    case 'reload':
+      window.location.reload(true);
+      break;
     case 'build_create':
       console.log('adding build');
       var elems = document.getElementsByClassName('lys-builds');
