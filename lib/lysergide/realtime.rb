@@ -19,7 +19,7 @@ module Lysergide::RealtimePool
   end
 
   def self.push(i)
-    LOG.info('Lysergide::RealtimePool') { "Pushed new #{i[:msg][:type]} event to queue" }
+    LOG.info('Lysergide::RealtimePool') { "New #{i[:msg][:type]} event queued" }
     @queue.push i
   end
 
