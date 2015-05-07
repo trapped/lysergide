@@ -18,6 +18,10 @@
 				working
 		.panel-body
 			.col-md-8
-				%pre{:id => 'build-log', :style => 'width: 100%'}= build.log
+				%pre.lys-build-log{:lys_build => "#{repo.name} #{build.number}", :style => 'width: 100%'}= build.log
 				%script{:src => '/js/ansi_up.js'}
-				%script{:type => 'text/javascript'}= "var log = document.getElementById('build-log');log.innerHTML = ansi_up.ansi_to_html(log.innerHTML);"
+				:javascript
+					var logs = document.getElementsByClassName('lys-build-log');
+					for(var i = 0; i < logs.length; i++) {
+						logs[i].innerHTML = ansi_up.ansi_to_html(logs[i].innerHTML);
+					}
