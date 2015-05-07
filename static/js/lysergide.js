@@ -102,9 +102,10 @@ lys.setupWs = function() {
     if(document.getElementsByClassName('lys-builds').length > 0) {
       lys.ws.send('sub builds');
     }
-    if(var logs = document.getElementsByClassName('lys-build-log'); logs.length > 0) {
+    var logs = document.getElementsByClassName('lys-build-log');
+    if(logs.length > 0) {
       for(var i = 0; i < logs.length; i++) {
-        lys.ws.send('sub build_log ' + logs[i].getAttribute('lys-build'));
+        lys.ws.send('sub build_log ' + logs[i].getAttribute('lys_build'));
       }
     }
   };
