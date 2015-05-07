@@ -102,6 +102,11 @@ lys.setupWs = function() {
     if(document.getElementsByClassName('lys-builds').length > 0) {
       lys.ws.send('sub builds');
     }
+    if(var logs = document.getElementsByClassName('lys-build-log'); logs.length > 0) {
+      for(var i = 0; i < logs.length; i++) {
+        lys.ws.send('sub build_log ' + logs[i].getAttribute('lys-build'));
+      }
+    }
   };
   lys.ws.onclose   = function()  { console.log('websocket closed, reconnecting in 3s'); lys.initialized = false; setTimeout(lys.setupWs, 3000); };
   lys.ws.onmessage = function(m) { lys.handle(JSON.parse(m.data)); };
