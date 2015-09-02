@@ -18,24 +18,6 @@ class Lysergide::Repos < Sinatra::Base
   use Lysergide::Errors
   helpers Lysergide::ErrorHelpers
 
-  get '/:user/:repo' do |user, repo|
-    begin
-      unless User.find_by_name(user).repos.find_by_name(repo).public? || session[:user] && session[:user] == User.find_by_name(user).id
-        not_found
-      end
-    rescue
-      not_found
-    end
-    user = User.find_by_name(user) || not_found
-    repo = user.repos.find_by_name(repo) || not_found
-    haml :repo, layout: :base, :locals => {
-      title: "Lysergide CI - #{user.name}/#{repo.name}",
-      user: user,
-      repo: repo,
-      alert: alert_obj(params[:err])
-    }
-  end
-
   get '/add/repo' do
     redirect '/login' unless session[:user]
     haml :addrepo, layout: :base, :locals => {
@@ -67,5 +49,23 @@ class Lysergide::Repos < Sinatra::Base
       status 500
       redirect '/add/repo?err=unknown'
     end
+  end
+
+  get '/:user/:repo' do |user, repo|
+    begin
+      unless User.find_by_name(user).repos.find_by_name(repo).public? || session[:user] && session[:user] == User.find_by_name(user).id
+        not_found
+      end
+    rescue
+      not_found
+    end
+    user = User.find_by_name(user) || not_found
+    repo = user.repos.find_by_name(repo) || not_found
+    haml :repo, layout: :base, :locals => {
+      title: "Lysergide CI - #{user.name}/#{repo.name}",
+      user: user,
+      repo: repo,
+      alert: alert_obj(params[:err])
+    }
   end
 end

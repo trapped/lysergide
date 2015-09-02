@@ -3,11 +3,11 @@ require 'active_record'
 require 'lysergide/database'
 require 'lysergide/errors'
 require 'lysergide/login'
-require 'lysergide/repos'
 require 'lysergide/builds'
 require 'lysergide/hooks'
 require 'lysergide/realtime'
 require 'lysergide/helpers'
+require 'lysergide/repos'
 require 'haml'
 
 include Lysergide::Database
@@ -22,10 +22,10 @@ class Lysergide::Application < Sinatra::Base
   use Lysergide::Errors
   helpers Lysergide::ErrorHelpers
   use Lysergide::Login
-  use Lysergide::Repos
   use Lysergide::Builds
   use Lysergide::Hooks
   use Lysergide::Realtime
+  use Lysergide::Repos
 
   before do
     LOG.info("Lysergide") {
