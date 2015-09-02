@@ -14,7 +14,7 @@
 			- if user.builds.length > 0
 				.list-group.lys-builds
 					- user.builds.reorder(id: :desc).first(50).each do |build|
-						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
+						%a.list-group-item{:href => "/#{user.name}/#{build.repo.name}/builds/#{build.number}"}
 							- case build.status
 							- when :scheduled
 								%i.fa.fa-calendar.fa-fw

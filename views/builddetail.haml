@@ -1,6 +1,9 @@
 .row
 	.col-md-12
-		%h1.page-header= "#{user.name}/#{repo.name}##{build.number}"
+		%h1.page-header
+			%span>= "#{user.name}/"
+			%a.repo_link{style: "#{repo.public? ? 'color: green' : ''}", href: "/#{user.name}/#{repo.name}"}>= "#{repo.name}"
+			%span>= "##{build.number}"
 .row-fluid
 	.panel.panel-default
 		.panel-heading
@@ -8,7 +11,7 @@
 			- when :failed
 				.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
 				failing (
-				%a{:href => "/repo/#{repo.name}/builds/#{build.number}/retry"}>retry
+				%a{:href => "/#{user.name}/#{repo.name}/builds/#{build.number}/retry"}>retry
 				)
 			- when :success
 				%i.fa.fa-check.fa-fw{:style => 'color: green'}

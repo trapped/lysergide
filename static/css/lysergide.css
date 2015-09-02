@@ -356,3 +356,12 @@ table.dataTable thead .sorting:after {
     margin-top: 20px;
     margin-bottom: 10px !important;
 }
+
+a.repo_link {
+    text-decoration: none;
+}
+
+a.repo_link:hover {
+    text-decoration: none;
+    border-bottom: 0.1em solid currentColor;
+}

@@ -1,13 +1,16 @@
 .row
 	.col-md-12
-		%h1.page-header= "#{user.name}/#{repo.name} - Builds"
+		%h1.page-header
+			%span>= "#{user.name}/"
+			%a.repo_link{style: "#{repo.public? ? 'color: green' : ''}", href: "/#{user.name}/#{repo.name}"}>= "#{repo.name}"
+			%span= " - Builds"
 .row-fluid
 	.panel.panel-default
 		.panel-body
 			- if repo.builds.length > 0
 				.list-group.lys-builds
 					- repo.builds.each do |build|
-						%a.list-group-item{:href => "/repo/#{build.repo.name}/builds/#{build.number}"}
+						%a.list-group-item{:href => "/#{user.name}/#{repo.name}/builds/#{build.number}"}
 							- case build.status
 							- when :scheduled
 								%i.fa.fa-calendar.fa-fw

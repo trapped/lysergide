@@ -13,34 +13,35 @@ module Lysergide
     # Define the database schema
     ActiveRecord::Schema.define do
       unless ActiveRecord::Base.connection.tables.include? 'users'
-        create_table :users do |table|
-          table.column :name,          :string
-          table.column :email,         :string
-          table.column :password,      :string
+        create_table :users do |t|
+          t.string :name,     null: false
+          t.string :email,    null: false
+          t.string :password, null: false
         end
       end
 
       unless ActiveRecord::Base.connection.tables.include? 'repos'
-        create_table :repos do |table|
-          table.column :name,          :string
-          table.column :import_path,   :string
-          table.column :user_id,       :integer
-          table.column :token,         :string
-          table.column :last_pull,     :string
-          table.column :pull_interval, :integer
+        create_table :repos do |t|
+          t.string  :name,        null: false
+          t.string  :import_path, null: false
+          t.integer :user_id,     null: false
+          t.string  :token,       null: false
+          t.string  :last_pull
+          t.integer :pull_interval
+          t.boolean :public,      null: false
         end
       end
 
       unless ActiveRecord::Base.connection.tables.include? 'builds'
-        create_table :builds do |table|
-          table.column :repo_id,       :integer
-          table.column :user_id,       :integer
-          table.column :number,        :integer
-          table.column :status,        :text
-          table.column :date,          :string
-          table.column :duration,      :integer
-          table.column :ref,           :text
-          table.column :log,           :text
+        create_table :builds do |t|
+          t.integer  :repo_id, null: false
+          t.integer  :user_id, null: false
+          t.integer  :number,  null: false
+          t.text     :status
+          t.string   :date
+          t.integer  :duration
+          t.text     :ref
+          t.text     :log
         end
       end
     end
@@ -53,6 +54,19 @@ module Lysergide
     class Repo < ActiveRecord::Base
       belongs_to :user
       has_many   :builds
+
+      def public
+        public?
+      end
+
+      def public?
+        !!super
+      end
+
+      def public=(value)
+        super(value.to_i)
+        public?
+      end
     end
 
     class Build < ActiveRecord::Base

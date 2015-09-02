@@ -17,7 +17,7 @@
 		#wrapper
 			%nav.navbar.navbar-default.navbar-static-top{:role => "navigation", :style => "margin-bottom: 0"}
 				.navbar-header
-					- if defined? user
+					- if session[:user]
 						%button.navbar-toggle{"data-target" => ".navbar-collapse", "data-toggle" => "collapse", :type => "button"}
 							%span.sr-only Toggle navigation
 							%span.icon-bar
@@ -26,7 +26,7 @@
 					%a.navbar-brand{:href => "/"}
 						%span.fa.fa-tint.fa-fw
 						%span Lysergide
-				- if defined? user
+				- if session[:user]
 					%ul.nav.navbar-top-links.navbar-right
 						%li.dropdown
 							%a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
@@ -52,16 +52,12 @@
 									%ul.nav.nav-second-level
 										- user.repos.each do |repo|
 											%li
-												%a{:href => "/repo/" + repo.name}= repo.name
-			- if !defined? user
-				#page-wrapper{style: 'margin-left: 0px !important'}
-					=yield
-			- else
-				#page-wrapper
-					- if defined? alert
-						- if alert
-							.alert.col-md-6.col-md-offset-3{:class => 'alert-'+alert.type}= alert.msg
-					=yield
+												%a{:href => "/#{user.name}/#{repo.name}"}= repo.name
+			#page-wrapper{style: "#{!session[:user] ? 'margin-left: 0px !important' : ''}"}
+				- if defined? alert
+					- if alert
+						.alert.col-md-6.col-md-offset-3{:class => 'alert-'+alert.type}= alert.msg
+				=yield
 		%script{:src => "/js/jquery.js"}
 		%script{:src => "/js/bootstrap.min.js"}
 		-#%script{:src => "/js/plugins/metisMenu/metisMenu.min.js"}

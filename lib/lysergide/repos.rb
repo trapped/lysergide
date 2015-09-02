@@ -1,11 +1,13 @@
 require 'sinatra/base'
 require 'lysergide/database'
 require 'lysergide/errors'
+require 'lysergide/helpers'
 require 'digest'
 require 'haml'
 require 'uri'
 
 include Lysergide::Database
+include Lysergide::Helpers
 
 class Lysergide::Repos < Sinatra::Base
   set :root, File.dirname(__FILE__) + '/../../'
@@ -16,64 +18,26 @@ class Lysergide::Repos < Sinatra::Base
   use Lysergide::Errors
   helpers Lysergide::ErrorHelpers
 
-  def is_valid_name?(name)
-    (name =~ /\A\p{Alnum}+\z/) != nil
-  end
-
-  def is_valid_path?(path)
-    (URI.regexp =~ path) != nil
-  end
-
-  def alert_obj(err)
-    return nil unless err
-    obj = Object.new
-    obj.class.module_eval {
-      attr_accessor :type
-      attr_accessor :msg
-    }
-    obj.type = 
-      case err
-      when 'name', 'path', 'unknown'
-        'danger'
-      else
-        'warning'
+  get '/:user/:repo' do |user, repo|
+    begin
+      unless User.find_by_name(user).repos.find_by_name(repo).public? || session[:user] && session[:user] == User.find_by_name(user).id
+        not_found
       end
-    obj.msg =
-      case err
-      when 'name'
-        'Invalid repo name; only alphanumeric names are allowed.'
-      when 'path'
-        'Invalid repo path; check it is a valid URI and git recognizes it.'
-      when 'unknown'
-        'Unknown error.'
-      else
-        "Unknown error: #{err}"
-      end
-    return obj
-  end
-
-  get '/repo/:name' do |name|
-    unless session[:user]
-      redirect '/login'
-    end
-    user = User.find(session[:user])
-    repo = user.repos.find_by_name(name)
-    if repo
-      haml :repo, layout: :base, :locals => {
-        title: "Lysergide CI - #{name}",
-        user: user,
-        repo: repo,
-        alert: alert_obj(params[:err])
-      }
-    else
+    rescue
       not_found
     end
+    user = User.find_by_name(user) || not_found
+    repo = user.repos.find_by_name(repo) || not_found
+    haml :repo, layout: :base, :locals => {
+      title: "Lysergide CI - #{user.name}/#{repo.name}",
+      user: user,
+      repo: repo,
+      alert: alert_obj(params[:err])
+    }
   end
 
   get '/add/repo' do
-    unless session[:user]
-      redirect '/login'
-    end
+    redirect '/login' unless session[:user]
     haml :addrepo, layout: :base, :locals => {
       title: 'Lysergide CI - Add repo',
       user: User.find(session[:user]),
@@ -82,14 +46,12 @@ class Lysergide::Repos < Sinatra::Base
   end
 
   post '/add/repo' do
-    unless session[:user]
-      redirect '/login'
-    end
+    redirect '/login' unless session[:user]
     case
-    when !is_valid_name?(params[:name])
+    when !valid_repo_name?(params[:name])
       status 500
       redirect '/add/repo?err=name'
-    when !is_valid_path?(params[:import_path])
+    when !valid_repo_path?(params[:import_path])
       status 500
       redirect '/add/repo?err=path'
     end

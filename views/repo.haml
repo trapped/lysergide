@@ -1,6 +1,8 @@
 .row
 	.col-md-12
-		%h1.page-header= "#{user.name}/#{repo.name}"
+		%h1.page-header
+			%span>= "#{user.name}/"
+			%span{style: "#{repo.public? ? 'color: green' : ''}"}>= "#{repo.name}"
 .row-fluid
 	.panel.panel-default
 		.panel-heading
@@ -37,14 +39,14 @@
 							%td
 								%b Builds:
 							%td
-								%a{href: "/repo/#{repo.name}/builds"}= repo.builds.length
+								%a{href: "/#{user.name}/#{repo.name}/builds"}= repo.builds.length
 						%tr
 							%td
 								%b Status:
 							%td
 								- last_build = repo.builds.find {|b| b.status != :working}
 								- if last_build
-									%a{href: "/repo/#{repo.name}/builds/#{last_build.number}"}
+									%a{href: "/#{user.name}/#{repo.name}/builds/#{last_build.number}"}
 										- case last_build.status
 										- when :failed
 											.fa.fa-warning.fa-fw{:style => 'color: firebrick'}
