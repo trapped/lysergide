@@ -22,11 +22,12 @@
 								%b Import path:
 							%td
 								%a{href: repo.import_path}= repo.import_path
-						%tr
-							%td
-								%b Hook token:
-							%td
-								= repo.token
+						- if session[:user] == user.id
+							%tr
+								%td
+									%b Hook token:
+								%td
+									= repo.token
 						%tr
 							%td
 								%b Last pull:
