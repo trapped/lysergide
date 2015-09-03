@@ -1,5 +1,8 @@
 require 'sinatra/base'
+require 'lysregide/database'
 require 'haml'
+
+include Lysergide::Database
 
 module Lysergide
   module ErrorHelpers
@@ -22,7 +25,8 @@ class Lysergide::Errors < Sinatra::Base
 
   not_found do
     haml :notfound, layout: :base, locals: {
-      title: 'Lysergide CI - Not found'
+      title: 'Lysergide CI - Not found',
+      user: User.find(session[:user])
     }
   end
 end
