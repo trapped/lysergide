@@ -8,7 +8,7 @@ WORKERS_POOL_SIZE = ENV['LYS_WORKER_POOL_SIZE'] || 2
 
 module Lysergide
   module Jobs
-    @workers_pool = Array.new
+    @workers_pool = [].new
     @workers_pool_lock = Mutex.new
     @dispatch_lock = Mutex.new
     @accept_jobs = false
@@ -18,7 +18,7 @@ module Lysergide
     def self.dispatch(worker_id, block = true)
       @dispatch_lock.synchronize {
         LOG.info('Lysergide::Jobs') { 'Dispatching job' }
-        while true
+        loop do
           next_build = Build.find_by_status(:scheduled)
           if next_build
             LOG.debug('Lysergide::Jobs') { "Next build: #{next_build.id}" }
@@ -38,23 +38,23 @@ module Lysergide
     end
 
     # Checks if any worker in the pool is done running its job and eventually removes it
-    def self.clear_pool()
+    def self.clear_pool
       @workers_pool_lock.synchronize {
         LOG.info('Lysergide::Jobs') { 'Clearing worker pool' }
-        @workers_pool.delete_if { |worker| worker.done? }
+        @workers_pool.delete_if(&:done?)
       }
     end
 
     # Gets a new worker if available
-    def self.next_worker()
+    def self.next_worker
       @workers_pool_lock.synchronize {
         if @workers_pool.length < WORKERS_POOL_SIZE
           LOG.info('Lysergide::Jobs') { "Available workers: #{WORKERS_POOL_SIZE - @workers_pool.length}" }
-          used_ids = @workers_pool.map { |worker| worker.id }
+          used_ids = @workers_pool.map(&:id)
           LOG.debug('Lysergide::Jobs') { "Used worker IDs: #{used_ids.inspect}" }
-          available_ids = Array.new(WORKERS_POOL_SIZE).fill { |id|
+          available_ids = [].new(WORKERS_POOL_SIZE).fill { |id|
             used_ids.include?(id) ? nil : id
-          }.delete_if { |elem| elem == nil }
+          }.delete_if(&:nil?)
           LOG.debug('Lysergide::Jobs') { "Available worker IDs: #{available_ids.inspect}" }
           if available_ids.length > 0
             LOG.info('Lysergide::Jobs') { 'Claiming worker' }
@@ -71,8 +71,8 @@ module Lysergide
     end
 
     # Checks for scheduled periodic builds and adds them to the queue; starts workers
-    def self.schedule()
-      clear_pool()
+    def self.schedule
+      clear_pool
       LOG.info('Lysergide::Jobs') { 'Scheduling next job' }
       while worker = next_worker
         LOG.info('Lysergide::Jobs') { "Got new worker: #{worker.id}" }
@@ -91,11 +91,11 @@ module Lysergide
                 begin
                   wrk.start job
                 rescue SystemExit
-                  if !wrk.done?
+                  unless wrk.done?
                     LOG.error("Lysergide::Worker##{wrk.id}") {
-                      "Worker thread died: #{$!}\n#{$@.join "\n"}"
+                      "Worker thread died: #{$ERROR_INFO}\n#{$ERROR_POSITION.join "\n"}"
                     }
-                    wrk.fail $!.message.to_s
+                    wrk.fail $ERROR_INFO.message.to_s
                   end
                 ensure
                   wrk = nil
@@ -112,7 +112,7 @@ module Lysergide
     end
 
     # Resets all jobs marked as 'working' to 'scheduled' so that they can be picked up by dispatch
-    def self.reschedule_blocked()
+    def self.reschedule_blocked
       builds = Build.where(status: :working)
       if builds && builds.length > 0
         LOG.info('Lysergide::Jobs') { "Resetting #{builds.length} jobs" }
@@ -121,7 +121,7 @@ module Lysergide
     end
 
     # Removes temporary directories that haven't been cleaned up
-    def self.delete_temp()
+    def self.delete_temp
       Dir.chdir(Dir.tmpdir) do
         Dir.glob('./lysergide*-job*').select { |dir|
           LOG.info('Lysergide::Jobs') { "Removing '#{File.join(Dir.tmpdir, dir)}'" }
@@ -131,30 +131,28 @@ module Lysergide
     end
 
     # Starts the job scheduler (pulling events and addings jobs) on a separate thread
-    def self.start()
+    def self.start
       delete_temp
       reschedule_blocked
-      if !Thread.abort_on_exception
-        Thread.abort_on_exception = true
-      end
+      Thread.abort_on_exception = true unless Thread.abort_on_exception
       LOG.info('Lysergide::Jobs') { 'Starting Lysergide::Jobs' }
       @accept_jobs = true
       @scheduler_thread = Thread.new {
         begin
           while @accept_jobs
-            Lysergide::Jobs.schedule()
+            Lysergide::Jobs.schedule
             sleep(1)
           end
           @scheduler_thread = nil
         rescue
-          LOG.error('Lysergide::Jobs') { "Scheduler thread died: #{$!}\n#{$@}" }
+          LOG.error('Lysergide::Jobs') { "Scheduler thread died: #{$ERROR_INFO}\n#{$ERROR_POSITION}" }
           stop
         end
       }
     end
 
     # Stops the job scheduler with quite some violence
-    def self.stop()
+    def self.stop
       LOG.info('Lysergide::Jobs') { 'Stopping' }
       ensure
         @accept_jobs = false
