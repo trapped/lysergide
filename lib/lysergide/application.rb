@@ -8,6 +8,7 @@ require 'lysergide/hooks'
 require 'lysergide/realtime'
 require 'lysergide/helpers'
 require 'lysergide/repos'
+require 'tilt/haml'
 require 'haml'
 
 include Lysergide::Database
@@ -27,12 +28,12 @@ class Lysergide::Application < Sinatra::Base
   use Lysergide::Realtime
   use Lysergide::Repos
 
-  before do
-    LOG.info("Lysergide") {
-      "#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
-      "#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
-    }
-  end
+  #before do
+  #  LOG.info('Lysergide') {
+  #    "#{request.scheme.upcase} #{request.request_method} from #{request.ip}: " \
+  #    "#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
+  #  }
+  #end
 
   after do
     ActiveRecord::Base.clear_active_connections!
@@ -40,14 +41,14 @@ class Lysergide::Application < Sinatra::Base
 
   get '/' do
     if session[:user]
-      haml :dashboard, layout: :base, :locals => {
+      haml :dashboard, layout: :base, locals: {
         title: 'Lysergide CI - Dashboard',
         helpers: Lysergide::Helpers,
         user: User.find(session[:user])
       }
     else
       redirect '/login'
-      haml :welcome, :locals => {
+      haml :welcome, locals: {
         title: 'Lysergide CI - Powered by Acid'
       }
     end
