@@ -9,8 +9,8 @@ include Lysergide::Database
 class Lysergide::Hooks < Sinatra::Base
   # Seems like the before/after filters from Lysergide::Application either don't work with POST or they don't reach here
   before do
-    LOG.info("Lysergide") {
-      "#{request.scheme.upcase} #{request.request_method} from #{request.ip.to_s}: " +
+    LOG.info('Lysergide') {
+      "#{request.scheme.upcase} #{request.request_method} from #{request.ip}: " \
       "#{request.path} user_agent:\"#{request.user_agent}\" content_length:\"#{request.content_length}\""
     }
   end
@@ -24,7 +24,8 @@ class Lysergide::Hooks < Sinatra::Base
     # Disable cookies for this request
     request.session_options[:skip] = true
     # The header is actually X-Lysergide-Token
-    repo = Repo.find_by_token(request.env["HTTP_X_LYSERGIDE_TOKEN"])
+    repo = Repo.find_by_token(request.env['HTTP_X_LYSERGIDE_TOKEN'])
+    new_builds_count = 0
     if repo
       request.body.rewind
       body = request.body.read
@@ -33,9 +34,7 @@ class Lysergide::Hooks < Sinatra::Base
         new_commit = sref[1]
         last_build = repo.builds.order(number: :desc).first
         number = 1
-        if last_build
-          number = last_build.number + 1
-        end
+        number = last_build.number + 1 if last_build
         new_build = repo.builds.create({
           user_id: repo.user.id,
           number: number,
@@ -43,15 +42,16 @@ class Lysergide::Hooks < Sinatra::Base
           status: :scheduled
         })
         if new_build
+          new_builds_count += 1
           LOG.info('Lysergide::Hooks') {
             "New build (#{new_build.repo.user.name}/#{new_build.repo.name}##{new_build.number}) has been scheduled"
           }
-          status 200 # TODO: only the latest commit?
         else
           LOG.error('Lysergide::Hooks') { "Internal error on repo.builds.create (standard hook)" }
           status 500
         end
       end
+      status 200
     else
       LOG.error('Lysergide::Hooks') { "No matching repo found for token #{request.env['HTTP_X_LYSERGIDE_TOKEN']}" }
       status 400
@@ -77,6 +77,7 @@ class Lysergide::Hooks < Sinatra::Base
         LOG.error('Lysergide::Hooks') { "No matching repo for '#{gh_repo['url']}'"}
         halt 400, {'Content-Type' => 'text/plain'}, 'No matching repo'
       end
+      new_builds_count = 0
       repos.each do |repo|
         unique_signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), repo.token, body)
         if Rack::Utils.secure_compare(unique_signature, request.env['HTTP_X_HUB_SIGNATURE'])
@@ -98,10 +99,10 @@ class Lysergide::Hooks < Sinatra::Base
               status: :scheduled
             })
             if new_build
+              new_builds_count += 1
               LOG.info('Lysergide::Hooks') {
                 "New build (#{new_build.repo.user.name}/#{new_build.repo.name}##{new_build.number}) has been scheduled"
               }
-              halt 200
             else
               LOG.error('Lysergide::Hooks') { "Internal error on repo.builds.create (GitHub hook)" }
               halt 500
@@ -109,6 +110,7 @@ class Lysergide::Hooks < Sinatra::Base
           end
         end
       end
+      halt 200
     else
       LOG.error('Lysergide::Hooks') { "Unhandled GitHub hook event: #{request.env['HTTP_X_GITHUB_EVENT']}" }
       halt 400
