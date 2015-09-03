@@ -1,5 +1,5 @@
 require 'sinatra/base'
-require 'lysregide/database'
+require 'lysergide/database'
 require 'haml'
 
 include Lysergide::Database
