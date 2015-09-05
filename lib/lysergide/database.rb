@@ -80,7 +80,7 @@ module Lysergide
           subs:  ['builds', 'build_create'],
           msg: {
             type: 'build_create',
-            user: build.repo.user,
+            user: build.repo.user.name,
             repo: build.repo.name,
             build: {
               number: build.number,
@@ -97,7 +97,7 @@ module Lysergide
           subs:  ['builds', 'build_update'],
           msg: {
             type: 'build_update',
-            user: build.repo.user,
+            user: build.repo.user.name,
             repo: build.repo.name,
             build: {
               number: build.number,
