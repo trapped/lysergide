@@ -8,7 +8,7 @@ WORKERS_POOL_SIZE = ENV['LYS_WORKER_POOL_SIZE'] || 2
 
 module Lysergide
   module Jobs
-    @workers_pool = [].new
+    @workers_pool = []
     @workers_pool_lock = Mutex.new
     @dispatch_lock = Mutex.new
     @accept_jobs = false
@@ -52,7 +52,7 @@ module Lysergide
           LOG.info('Lysergide::Jobs') { "Available workers: #{WORKERS_POOL_SIZE - @workers_pool.length}" }
           used_ids = @workers_pool.map(&:id)
           LOG.debug('Lysergide::Jobs') { "Used worker IDs: #{used_ids.inspect}" }
-          available_ids = [].new(WORKERS_POOL_SIZE).fill { |id|
+          available_ids = Array.new(WORKERS_POOL_SIZE).fill { |id|
             used_ids.include?(id) ? nil : id
           }.delete_if(&:nil?)
           LOG.debug('Lysergide::Jobs') { "Available worker IDs: #{available_ids.inspect}" }
