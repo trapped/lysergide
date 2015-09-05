@@ -45,7 +45,7 @@ lys.handleEvent = function(e) {
         if(elems[i].classList.contains('list-group')) {
           var new_item = elems[i].insertBefore(document.createElement('a'), elems[i].childNodes[0]);
           new_item.className = 'list-group-item';
-          new_item.setAttribute('href', '/repo/' + e.msg.repo + '/builds/' + e.msg.build.number);
+          new_item.setAttribute('href', '/' + e.msg.user + '/' + e.msg.repo + '/builds/' + e.msg.build.number);
           new_item.innerText = ' ' + e.msg.repo + ' ';
           var icon = new_item.insertBefore(document.createElement('i'), new_item.childNodes[0]);
           icon.className = 'fa fa-' + lys.fa_icon(e).icon + ' fa-fw';
@@ -68,7 +68,7 @@ lys.handleEvent = function(e) {
             if(elems[i].childNodes[ii].getAttribute === undefined) {
               continue;
             }
-            if(elems[i].childNodes[ii].getAttribute('href') === ('/repo/' + e.msg.repo + '/builds/' + e.msg.build.number)) {
+            if(elems[i].childNodes[ii].getAttribute('href') === ('/' + e.msg.user + '/' + e.msg.repo + '/builds/' + e.msg.build.number)) {
               elems[i].childNodes[ii].childNodes[0].className = 'fa fa-' + lys.fa_icon(e).icon + ' fa-fw';
               elems[i].childNodes[ii].childNodes[0].style.color = lys.fa_icon(e).color;
               elems[i].childNodes[ii].childNodes[3].innerHTML = '<em>' + e.msg.build.date ? e.msg.build.date : '' + '</em>';
