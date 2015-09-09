@@ -81,7 +81,8 @@ class Lysergide::Repos < Sinatra::Base
     repo = user.repos.find_by_name(repo) || not_found
     halt 200, { 'Content-Type' => 'image/svg+xml' }, haml(:status, :locals => {
       user: user,
-      repo: repo
+      repo: repo,
+      build: repo.builds.where(status: %w(success failed)).first
     })
   end
 end
