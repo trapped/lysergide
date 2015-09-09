@@ -68,4 +68,20 @@ class Lysergide::Repos < Sinatra::Base
       alert: alert_obj(params[:err])
     }
   end
+
+  get '/:user/:repo/status.svg' do |user, repo|
+    begin
+      unless User.find_by_name(user).repos.find_by_name(repo).public? || session[:user] && session[:user] == User.find_by_name(user).id
+        not_found
+      end
+    rescue
+      not_found
+    end
+    user = User.find_by_name(user) || not_found
+    repo = user.repos.find_by_name(repo) || not_found
+    halt 200, { 'Content-Type' => 'image/svg+xml' }, haml(:status, :locals => {
+      user: user,
+      repo: repo
+    })
+  end
 end
