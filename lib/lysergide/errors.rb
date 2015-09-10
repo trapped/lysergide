@@ -25,8 +25,7 @@ class Lysergide::Errors < Sinatra::Base
 
   not_found do
     haml :notfound, layout: :base, locals: {
-      title: 'Lysergide CI - Not found',
-      user: User.find(session[:user])
+      title: 'Lysergide CI - Not found'
     }
   end
 end
