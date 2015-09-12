@@ -53,4 +53,8 @@ class Lysergide::Application < Sinatra::Base
       }
     end
   end
+
+  get '/favicon.ico' do
+    halt 200, { 'Content-Type' => 'image/svg+xml' }, haml(:favicon)
+  end
 end
