@@ -54,17 +54,17 @@ module Lysergide
       rescue Psych::SyntaxError
         fail "couldn't parse neither 'acid.yml' nor 'lysergide.yml', check your syntax (no tabs allowed!)"
       rescue ArgumentError
-        if $!.message == 'wrong first argument'
+        if $ERROR_INFO.message == 'wrong first argument'
           fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
         end
-        fail $!.message.to_s
+        fail $ERROR_INFO.message.to_s
       rescue NoMethodError
-        if $!.message.start_with?("undefined method `merge'")
+        if $ERROR_INFO.message.start_with?("undefined method `merge'")
           fail "malformed env in either 'acid.yml' or 'lysergide.yml', check your syntax"
         end
-        fail $!.message.to_s
+        fail $ERROR_INFO.message.to_s
       rescue
-        fail $!.message.to_s
+        fail $ERROR_INFO.message.to_s
       end
       case status
         when 999 then fail "couldn't find either 'acid.yml' or 'lysergide.yml' (#{status.to_s})"
