@@ -4,11 +4,11 @@ require 'lysergide/realtime'
 module Lysergide
   module Database
     # Connect to the database
-    ActiveRecord::Base.establish_connection ({
+    ActiveRecord::Base.establish_connection(
       adapter:  'sqlite3',
       database: 'lysergide.db',
       pool:     1024
-    })
+    )
 
     # Define the database schema
     ActiveRecord::Schema.define do
@@ -74,10 +74,10 @@ module Lysergide
 
       default_scope { order(number: :desc) }
 
-      after_create { |build|
-        Lysergide::RealtimePool.push({
+      after_create do |build|
+        Lysergide::RealtimePool.push(
           users: [build.repo.user.id],
-          subs:  ['builds', 'build_create'],
+          subs:  %(builds build_create),
           msg: {
             type: 'build_create',
             user: build.repo.user.name,
@@ -88,13 +88,13 @@ module Lysergide
               date:   build.date
             }
           }
-        })
-      }
+        )
+      end
 
-      after_update { |build|
-        Lysergide::RealtimePool.push({
+      after_update do |build|
+        Lysergide::RealtimePool.push(
           users: [build.repo.user.id],
-          subs:  ['builds', 'build_update'],
+          subs:  %w(builds build_update),
           msg: {
             type: 'build_update',
             user: build.repo.user.name,
@@ -105,8 +105,8 @@ module Lysergide
               date:   build.date
             }
           }
-        })
-      }
+        )
+      end
 
       def status
         super.to_sym

@@ -3,7 +3,7 @@
 require 'pathname'
 
 # Add lib directory to $LOAD_PATH
-$:.unshift File.expand_path('../../lib', Pathname.new(__FILE__)) #.realpath gives issues on pry
+$LOAD_PATH.unshift File.expand_path('../../lib', Pathname.new(__FILE__)) # .realpath gives issues on pry
 
 require 'lysergide'
 require 'colorize'
@@ -12,47 +12,47 @@ require 'timeout'
 puts
 
 if ARGV.length > 0
-	case ARGV[0]
-	when 'start'
-		if ARGV.length > 1
-			Lysergide.start(ARGV[1])
-		else
-			Lysergide.start(3000)
-		end
-	when 'populate'
-		require 'lysergide/database'
-		begin
-			Lysergide::Database::User.create(
-				name: ARGV[1] || 'admin',
-				email: ARGV[2] || 'admin@example.com',
-				password: ARGV[3] || 'admin'
-			)
-			puts "Populated database; default user: '#{ARGV[1] || 'admin'}', '#{ARGV[2] || 'admin@example.com'}', '#{ARGV[3] || 'admin'}'"
-			exit 0
-		rescue
-			puts 'Couldn\'t populate the database; perhaps it already contains data you might want to wipe with \'lsd destroy\''
-			exit 1
-		end
-	when 'destroy'
-		begin
-			if !File.exists? 'lysergide.db'
-				puts 'No database to wipe.'
-				exit 1
-			end
-			print 'Do you really want to completely wipe the database? (10 seconds before timeout) [y/N] '
-			Timeout.timeout(10) {
-				answer = STDIN.gets.chomp
-				if answer.length > 0 && answer[0].upcase == 'Y'
-					File.delete 'lysergide.db'
-					puts "\nDatabase wiped. You can initialize a new one with 'lsd populate user email password'"
-				end
-				exit 0
-			}
-		rescue => e
-			puts "\nDatabase wipe aborted: '#{e.message.to_s.red}'"
-		end
-		exit 1
-	end
+  case ARGV[0]
+  when 'start'
+    if ARGV.length > 1
+      Lysergide.start(ARGV[1])
+    else
+      Lysergide.start(3000)
+    end
+  when 'populate'
+    require 'lysergide/database'
+    begin
+      Lysergide::Database::User.create(
+        name: ARGV[1] || 'admin',
+        email: ARGV[2] || 'admin@example.com',
+        password: ARGV[3] || 'admin'
+      )
+      puts "Populated database; default user: '#{ARGV[1] || 'admin'}', '#{ARGV[2] || 'admin@example.com'}', '#{ARGV[3] || 'admin'}'"
+      exit 0
+    rescue
+      puts 'Couldn\'t populate the database; perhaps it already contains data you might want to wipe with \'lsd destroy\''
+      exit 1
+    end
+  when 'destroy'
+    begin
+      unless File.exist? 'lysergide.db'
+        puts 'No database to wipe.'
+        exit 1
+      end
+      print 'Do you really want to completely wipe the database? (10 seconds before timeout) [y/N] '
+      Timeout.timeout(10) do
+        answer = STDIN.gets.chomp
+        if answer.length > 0 && answer[0].upcase == 'Y'
+          File.delete 'lysergide.db'
+          puts "\nDatabase wiped. You can initialize a new one with 'lsd populate user email password'"
+        end
+        exit 0
+      end
+    rescue => e
+      puts "\nDatabase wipe aborted: '#{e.message.to_s.red}'"
+    end
+    exit 1
+  end
 else
-	Lysergide.start 3000
+  Lysergide.start 3000
 end

@@ -33,25 +33,33 @@ class Lysergide::Realtime < Sinatra::Base
   set :wthread, nil
 
   def sub(ws, s, args)
-    if args.length != 1
-      {type: :error, err: :a, msg: 'sub/1'}
-    else
-      s.wsockets[ws][:subs] << args[0]
-      LOG.info('Lysergide::Realtime') { "WebSocket by #{s.wsockets[ws][:user]} subscribed to #{args[0]}" }
-      {type: :success, msg: "+#{args[0]}"}
+    if args.length < 1
+      return {type: :error, err: :a, msg: 'sub/1'}
     end
+    type = args.shift
+    if s.wsockets[ws][:subs]
+      new_subs = [args]
+      new_subs.concat s.wsockets[ws][:subs][type] if s.wsockets[ws][:subs][type]
+      s.wsockets[ws][:subs].merge!({type => new_subs.length == 1 ? true : new_subs})
+    end
+    LOG.info('Lysergide::Realtime') { "WebSocket by #{s.wsockets[ws][:user]} subscribed to #{type}[#{args.join ', '}]" }
+    {type: :success, msg: "+#{type}"}
   end
 
   def unsub(ws, s, args)
-    if args.length != 1
-      {type: :error, err: :a, msg: 'unsub/1'}
-    else
-      if s.wsockets[ws][:subs][args[0]]
-        s.wsockets[ws][:subs].delete args[0]
-        {type: :success, msg: "-#{args[0]}"}
+    if args.length < 1
+      return {type: :error, err: :a, msg: 'unsub/1'}
+    end
+    type = args.shift
+    if s.wsockets[ws][:subs][type]
+      if args.length == 0
+        s.wsockets[ws][:subs].delete type
       else
-        {type: :error, err: :a, msg: "?#{args[0]}"}
+        s.wsockets[ws][:subs][type].delete args
       end
+      {type: :success, msg: "-#{type}"}
+    else
+      {type: :error, err: :a, msg: "?#{type}"}
     end
   end
 
@@ -87,7 +95,12 @@ class Lysergide::Realtime < Sinatra::Base
       ws.onopen do
         LOG.info('Lysergide::Realtime') { "WebSocket opened by #{request.ip.to_s}" }
         ws.send({ver: 'lys-0.1'}.to_json)
-        settings.wsockets.merge!({ws => {user: session[:user], subs: []}})
+        settings.wsockets.merge!({
+          ws => {
+            user: session[:user],
+            subs: {}
+          }
+        })
         if !settings.wthread
           settings.wthread = Thread.new do
             LOG.info('Lysergide::Realtime') { 'Worker started' }
@@ -98,10 +111,10 @@ class Lysergide::Realtime < Sinatra::Base
                 settings.wsockets.each do |s, d|
                   LOG.debug('Lysergide::Realtime') { "Iterating over WebSocket by #{d[:user]}" }
                   LOG.debug('Lysergide::Realtime') { "User: #{msg[:users].include? d[:user]}" }
-                  LOG.debug('Lysergide::Realtime') { "Subs: #{!(d[:subs] & msg[:subs]).empty?}" }
-                  if msg[:users].include?(d[:user]) && !(d[:subs] & msg[:subs]).empty?
+                  LOG.debug('Lysergide::Realtime') { "Subs: #{!(d[:subs].to_a & msg[:subs]).empty?}" }
+                  if msg[:users].include?(d[:user]) && !(d[:subs].to_a & msg[:subs]).empty?
                     LOG.debug('Lysergide::Realtime') { "WebSocket by #{d[:user]} eligible, forwarding" }
-                    s.send({type: :msg, subs: d[:subs] & msg[:subs], msg: msg[:msg]}.to_json)
+                    s.send({type: :msg, subs: d[:subs].to_a & msg[:subs], msg: msg[:msg]}.to_json)
                   end
                 end
               else
