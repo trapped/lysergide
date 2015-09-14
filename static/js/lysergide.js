@@ -88,7 +88,6 @@ lys.handleEvent = function(e) {
       var elems = document.getElementsByClassName('repo_name');
       for(i = 0; i < elems.length; i++) {
         elems[i].style.color = e.msg.public ? 'green' : '';
-        console.log(elems[i]);
       }
       break;
   }
