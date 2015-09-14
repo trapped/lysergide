@@ -64,8 +64,21 @@ module Lysergide
       end
 
       def public=(value)
-        super(value.to_i)
+        super([1, 'true', true, 't'].include? value ? 1 : 0)
         public?
+      end
+
+      after_update do |repo|
+        Lysergide::RealtimePool.push(
+          users: [repo.user.id],
+          subs: %w(repos repo_update),
+          msg: {
+            type: 'repo_update',
+            user: repo.user.name,
+            repo: repo.name,
+            public: repo.public?
+          }
+        )
       end
     end
 
