@@ -23,6 +23,12 @@ $(window).bind("load resize", function() {
 
 var lys = {};
 
+lys.page_data = {
+  user: undefined,
+  repo: undefined,
+  build: undefined
+};
+
 lys.fa_icon = function(e) {
   switch(e.msg.build.status) {
     case 'success':   return {icon: 'check',    color: 'green'};
@@ -77,6 +83,14 @@ lys.handleEvent = function(e) {
         }
       }
       break;
+    case 'repo_update':
+      console.log('updating repo');
+      var elems = document.getElementsByClassName('repo_name');
+      for(i = 0; i < elems.length; i++) {
+        elems[i].style.color = e.msg.public ? 'green' : '';
+        console.log(elems[i]);
+      }
+      break;
   }
 };
 
@@ -108,9 +122,17 @@ lys.setupWs = function() {
         lys.ws.send('sub build_log ' + logs[i].getAttribute('lys_build'));
       }
     }
+    if(lys.page_data.repo !== undefined) {
+      lys.ws.send('sub repos ' + lys.page_data.repo);
+    }
   };
   lys.ws.onclose   = function()  { console.log('websocket closed, reconnecting in 3s'); lys.initialized = false; setTimeout(lys.setupWs, 3000); };
   lys.ws.onmessage = function(m) { lys.handle(JSON.parse(m.data)); };
+};
+
+lys.repo_set = function(property, value) {
+  console.log('setting property \'' + property + '\' to ' + value + ' for repo ' + lys.page_data.repo)
+  lys.ws.send('repo_set ' + lys.page_data.repo + ' ' + property + ' ' + value);
 };
 
 window.addEventListener('load', function() {

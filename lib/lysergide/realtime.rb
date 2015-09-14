@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'sinatra-websocket'
 require 'thread'
 require 'json/ext'
+require 'lysergide/database'
 
 module Lysergide::RealtimePool
   @queue = Queue.new
@@ -63,6 +64,20 @@ class Lysergide::Realtime < Sinatra::Base
     end
   end
 
+  def repo_set(ws, s, args)
+    if args.length < 3
+      return {type: :error, err: :a, msg: 'repo_set/3'}
+    end
+    repo = User.find(s.wsockets[ws][:user]).repos.find_by_name(args.shift)
+    case args.shift
+    when 'public' then repo.public = %(true 1 yes t).include? args.shift
+    else
+      return {type: :error, err: :a, msg: '?'}
+    end
+    repo.save
+    return {type: :success, msg: "repo_updated"}
+  end
+
   def process(ws, s, msg)
     begin
       # cmd args...
@@ -74,6 +89,7 @@ class Lysergide::Realtime < Sinatra::Base
       when 'unsub' then unsub ws, s, args
       #when 'ping'  then ping  ws, s, args
       #when 'pong'  then pong  ws, s, args
+      when 'repo_set' then repo_set ws, s, args
       else
         LOG.warn('Lysergide::Realtime') { "Unknown command #{cmd} from #{s.wsockets[ws][:user]}" }
         {type: :error, err: :c, msg: 'unknown command'}
@@ -111,10 +127,10 @@ class Lysergide::Realtime < Sinatra::Base
                 settings.wsockets.each do |s, d|
                   LOG.debug('Lysergide::Realtime') { "Iterating over WebSocket by #{d[:user]}" }
                   LOG.debug('Lysergide::Realtime') { "User: #{msg[:users].include? d[:user]}" }
-                  LOG.debug('Lysergide::Realtime') { "Subs: #{!(d[:subs].to_a & msg[:subs]).empty?}" }
-                  if msg[:users].include?(d[:user]) && !(d[:subs].to_a & msg[:subs]).empty?
+                  LOG.debug('Lysergide::Realtime') { "Subs: #{!(d[:subs].to_a.flatten & msg[:subs]).empty?}" }
+                  if msg[:users].include?(d[:user]) && !(d[:subs].to_a.flatten & msg[:subs]).empty?
                     LOG.debug('Lysergide::Realtime') { "WebSocket by #{d[:user]} eligible, forwarding" }
-                    s.send({type: :msg, subs: d[:subs].to_a & msg[:subs], msg: msg[:msg]}.to_json)
+                    s.send({type: :msg, subs: d[:subs].to_a.flatten & msg[:subs], msg: msg[:msg]}.to_json)
                   end
                 end
               else

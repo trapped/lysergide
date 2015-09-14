@@ -2,8 +2,13 @@
 	.col-md-12
 		%h1.page-header
 			%span>= "#{user.name}/"
-			%span{style: "#{repo.public? ? 'color: green' : ''}"}>= "#{repo.name}"
+			%span{class: 'repo_name', style: "#{repo.public? ? 'color: green' : ''}"}>= "#{repo.name}"
 .row-fluid
+	:javascript
+		document.addEventListener('DOMContentLoaded', function() {
+			lys.page_data.user = '#{user.name}';
+			lys.page_data.repo = '#{repo.name}';
+		});
 	.panel.panel-default
 		.panel-heading
 			%i.fa.fa-gear.fa-fw
@@ -28,6 +33,11 @@
 									%b Hook token:
 								%td
 									= repo.token
+							%tr
+							%td
+								%b Public:
+							%td
+								%input{id: 'checkbox_toggle_public', type: 'checkbox', name: 'public', checked: repo.public?, onclick: "lys.repo_set('public', document.getElementById('checkbox_toggle_public').checked);"}
 						%tr
 							%td
 								%b Last pull:
