@@ -120,7 +120,7 @@ class Lysergide::Realtime < Sinatra::Base
         if !settings.wthread
           settings.wthread = Thread.new do
             LOG.info('Lysergide::Realtime') { 'Worker started' }
-            while true
+            loop do
               exit if Thread.current[:request_stop]
               if msg = Lysergide::RealtimePool.pop
                 LOG.info('Lysergide::Realtime') { "Dispatching #{msg.inspect}" }
