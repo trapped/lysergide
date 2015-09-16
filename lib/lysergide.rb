@@ -9,10 +9,10 @@ module Lysergide
     require 'lysergide/jobs'
     Lysergide::Jobs.start
     require 'lysergide/application'
-    lsd = Lysergide::Application
-    lsd.set :port, port
-    lsd.set :bind, '0.0.0.0'
-    lsd.run!
+    lys = Lysergide::Application
+    lys.set :port, port
+    lys.set :bind, '0.0.0.0'
+    lys.run!
     Lysergide::Jobs.stop
   end
 end
