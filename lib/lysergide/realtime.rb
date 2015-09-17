@@ -103,7 +103,7 @@ module Lysergide
       request.websocket do |ws|
         ws.onopen do
           LOG.info('Lysergide::Realtime') { "WebSocket opened by #{request.ip}" }
-          ws.send({ ver: 'lys-0.1' }.to_json)
+          ws.send({ ver: "lys-0.1-#{LYS_VERSION}" }.to_json)
           settings.wsockets.merge!(
             ws => {
               user: session[:user],

@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+LYS_VERSION = `git rev-parse --short HEAD`
+
 require 'pathname'
 
 # Add lib directory to $LOAD_PATH
@@ -9,7 +11,7 @@ require 'lysergide'
 require 'colorize'
 require 'timeout'
 
-puts
+puts "Lysergide ver. #{LYS_VERSION}"
 
 if ARGV.length > 0
   case ARGV[0]

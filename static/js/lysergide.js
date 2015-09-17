@@ -24,6 +24,7 @@ $(window).bind("load resize", function() {
 var lys = {};
 
 lys.page_data = {
+  version: undefined,
   user: undefined,
   repo: undefined,
   build: undefined
@@ -96,6 +97,11 @@ lys.handleEvent = function(e) {
 lys.handle = function(data) {
   if(!this.initialized) {
     console.log('remote ver.', data.ver);
+    if(lys.page_data.version === undefined) {
+      lys.page_data.version = data.ver;
+    } else if(lys.page_data.version != data.ver) {
+      location.reload(true);
+    }
     this.initialized = true;
   } else {
     switch(data.type) {
