@@ -90,7 +90,7 @@ module Lysergide
       after_create do |build|
         Lysergide::RealtimePool.push(
           users: [build.repo.user.id],
-          subs:  %(builds build_create),
+          subs:  %w(builds build_create),
           msg: {
             type: 'build_create',
             user: build.repo.user.name,
