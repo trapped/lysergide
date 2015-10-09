@@ -78,12 +78,12 @@ module Lysergide
       end
       user = User.find_by_name(user) || not_found
       repo = user.repos.find_by_name(repo) || not_found
-      halt 200, { 'Content-Type' => 'image/svg+xml' }, haml(:status, locals:
-      {
-        user: user,
-        repo: repo,
-        build: repo.builds.where(status: %w(success failed)).first
-      })
+      halt 200, { 'Content-Type' => 'image/svg+xml', 'Cache-Control' => 'no-cache' },
+        haml(:status, locals: {
+          user: user,
+          repo: repo,
+          build: repo.builds.where(status: %w(success failed)).first
+        })
     end
   end
 end
