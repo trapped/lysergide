@@ -31,7 +31,7 @@ lys.page_data = {
 };
 
 lys.fa_icon = function(e) {
-  switch(e.msg.build.status) {
+  switch(e) {
     case 'success':   return {icon: 'check',    color: 'green'};
     case 'failed':    return {icon: 'warning',  color: 'firebrick'};
     case 'scheduled': return {icon: 'calendar', color: ''};
@@ -55,13 +55,13 @@ lys.handleEvent = function(e) {
           new_item.setAttribute('href', '/' + e.msg.user + '/' + e.msg.repo + '/builds/' + e.msg.build.number);
           new_item.innerText = ' ' + e.msg.repo + ' ';
           var icon = new_item.insertBefore(document.createElement('i'), new_item.childNodes[0]);
-          icon.className = 'fa fa-' + lys.fa_icon(e).icon + ' fa-fw';
-          icon.style.color = lys.fa_icon(e).color;
+          icon.className = 'fa fa-' + lys.fa_icon(e.msg.build.status).icon + ' fa-fw';
+          icon.style.color = lys.fa_icon(e.msg.build.status).color;
           var number = new_item.appendChild(document.createElement('b'));
           number.className = 'pull-left';
           number.innerText = '#' + e.msg.build.number;
           var date = new_item.appendChild(document.createElement('span'));
-          date.className = 'pull-right text-muted small';
+          date.className = 'pull-right text-muted small lys-date';
           date.innerHTML = '<em>' + e.msg.build.date + '</em>';
         }
       }
@@ -76,9 +76,9 @@ lys.handleEvent = function(e) {
               continue;
             }
             if(elems[i].childNodes[ii].getAttribute('href') === ('/' + e.msg.user + '/' + e.msg.repo + '/builds/' + e.msg.build.number)) {
-              elems[i].childNodes[ii].childNodes[0].className = 'fa fa-' + lys.fa_icon(e).icon + ' fa-fw';
-              elems[i].childNodes[ii].childNodes[0].style.color = lys.fa_icon(e).color;
-              elems[i].childNodes[ii].childNodes[3].innerHTML = '<em>' + e.msg.build.date ? e.msg.build.date : '' + '</em>';
+              elems[i].childNodes[ii].firstElementChild.className = 'fa fa-' + lys.fa_icon(e.msg.build.status).icon + ' fa-fw';
+              elems[i].childNodes[ii].firstElementChild.style.color = lys.fa_icon(e.msg.build.status).color;
+              elems[i].childNodes[ii].getElementsByClassName('lys-date')[0].innerHTML = '<em>' + e.msg.build.date ? e.msg.build.date : '' + '</em>';
             }
           }
         }
