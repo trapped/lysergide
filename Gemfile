@@ -10,6 +10,7 @@ gem 'haml'
 gem 'acid', git: 'https://github.com/trapped/acid'
 gem 'activerecord'
 gem 'colorize'
+gem 'coffee-script'
 group :development do
   gem 'byebug'
 end

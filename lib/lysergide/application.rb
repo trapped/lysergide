@@ -10,6 +10,7 @@ require 'lysergide/helpers'
 require 'lysergide/repos'
 require 'tilt/haml'
 require 'haml'
+require 'coffee-script'
 
 include Lysergide::Database
 
@@ -48,11 +49,18 @@ module Lysergide
           user: User.find(session[:user])
         }
       else
-        redirect '/login'
-        haml :welcome, locals: {
+        #redirect '/login'
+        haml :welcome, layout: :base, locals: {
+          no_sidebar: true,
+          flex_vertical_center: true,
+          bg_kaleidoscope: true,
           title: 'Lysergide CI - Powered by Acid'
         }
       end
+    end
+
+    get '/kaleidoscope.js' do
+      coffee :kaleidoscope
     end
 
     get '/favicon.ico' do
