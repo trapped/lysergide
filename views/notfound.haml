@@ -1,7 +1,11 @@
-.row
-  .col-md-6.col-md-offset-3
-    %h1.page-header We've never seen anything like that.
-.row
-  .col-md-6.col-md-offset-3
-    It seems like we can't find the page you're looking for. Perhaps you spelled something wrong?
--# Some psychedelic/LSD-like art would be cool
+- if defined? bg_kaleidoscope
+  .container-fluid{style: 'position: fixed; height: 100%; width: 100%; top: 0; left: 0'}
+    %canvas{id: 'kaleidoscope', style: 'overflow: hidden; z-index: 0'}
+    %script{src: '/kaleidoscope.js', type: 'text/javascript'}
+.container{style: 'color: white'}
+  .row
+    .col-md-6.col-md-offset-3
+      %h1.page-header We've never seen anything like that.
+  .row
+    .col-md-6.col-md-offset-3
+      It seems like we can't find the page you're looking for. Perhaps you spelled something wrong?

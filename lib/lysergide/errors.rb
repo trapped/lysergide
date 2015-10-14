@@ -25,6 +25,7 @@ module Lysergide
     not_found do
       haml :notfound, layout: :base, locals: {
         no_sidebar: true,
+        bg_kaleidoscope: true,
         title: 'Lysergide CI - Not found'
       }
     end
