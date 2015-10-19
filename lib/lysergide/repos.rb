@@ -43,6 +43,7 @@ module Lysergide
         name: params[:name],
         import_path: params[:import_path],
         user_id: session[:user],
+        public: false,
         token: Digest::SHA256.hexdigest("#{params[:name]}:#{params[:import_path]}:#{session[:user]}"))
       then
         status 200
